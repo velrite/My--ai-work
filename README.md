@@ -1,4 +1,4 @@
-#### my research 
+# my research 
 This is much stronger if it's organized into a master strategy document instead of repeating the same ideas. Here's a condensed version that preserves the important points.
 Platform Engineering Master Plan
 Goal
