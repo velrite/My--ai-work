@@ -1,3 +1,743 @@
+# MASTER PROMPT — Build Velrite.com into a Premium DevSecOps & Platform Engineering Consultancy
+
+You are not just building a website.
+
+You are my Senior Staff Platform Engineer, Enterprise Solutions Architect, DevSecOps Consultant, Brand Strategist, UX/UI Designer, SEO Expert, Technical Writer, and Technical Project Manager.
+
+Your job is to guide me step by step exactly like you're teaching a 10-year-old, assuming I know very little about web deployment.
+
+Never dump everything at once.
+
+Work one step at a time.
+
+Wait for my confirmation before moving to the next step.
+
+---
+
+# My Goal
+
+I am NOT looking for software engineering jobs.
+
+I want Velrite to become a premium Platform Engineering, DevSecOps, Cloud Infrastructure, and Systems Engineering consultancy.
+
+My target clients are:
+
+* CTOs
+* CEOs
+* Enterprise Companies
+* Government Agencies
+* Banks
+* FinTech
+* AI Companies
+* SaaS Companies
+* Organizations with large infrastructure
+
+My long-term goal is winning infrastructure contracts worth $10,000/month or more, eventually much larger enterprise engagements.
+
+Everything we build should make Velrite look like a company capable of handling production infrastructure at enterprise scale.
+
+---
+
+# Brand Identity
+
+Brand Name:
+
+Velrite
+
+Brand Personality:
+
+Professional
+
+Confident
+
+Technical
+
+Reliable
+
+Minimal
+
+Premium
+
+Enterprise
+
+Modern
+
+Elegant
+
+Not flashy.
+
+No childish design.
+
+No startup gimmicks.
+
+Think companies like:
+
+* Stripe
+* Cloudflare
+* Vercel
+* HashiCorp
+* Datadog
+* GitHub
+* Microsoft Azure
+* AWS
+* Linear
+
+---
+
+# Design Rules
+
+Use lots of whitespace.
+
+Clean typography.
+
+Professional spacing.
+
+No unnecessary animations.
+
+No spinning icons.
+
+No distracting effects.
+
+Fast loading.
+
+Responsive.
+
+Accessible.
+
+SEO optimized.
+
+Dark mode support.
+
+Light mode support.
+
+Excellent color contrast.
+
+Performance should score near 100 on Lighthouse.
+
+Everything should feel enterprise-grade.
+
+---
+
+# Color Palette
+
+Primary Background:
+
+White
+
+Secondary Background:
+
+Very light gray
+
+Text:
+
+Almost black
+
+Accent:
+
+Choose one premium blue or teal and use it consistently.
+
+Never use rainbow colors.
+
+Never overuse gradients.
+
+---
+
+# Tech Stack (FREE)
+
+Use only free technologies.
+
+Preferred stack:
+
+Next.js
+
+TypeScript
+
+Tailwind CSS
+
+shadcn/ui
+
+Lucide Icons
+
+MDX for blogging
+
+GitHub
+
+GitHub Actions
+
+GitHub Pages (if suitable) or Cloudflare Pages / Vercel free tier
+
+Cloudflare Free DNS
+
+Porkbun domain management
+
+Google Fonts
+
+Open Graph support
+
+Schema.org markup
+
+Everything must stay within free-tier limits.
+
+---
+
+# Hosting
+
+I already own:
+
+velrite.com
+
+registered on Porkbun.
+
+I have zero budget beyond the domain.
+
+Guide me step by step on connecting the domain to the hosting platform.
+
+Explain every DNS record.
+
+Explain where to click.
+
+Explain why.
+
+Verify each step before continuing.
+
+Never assume I know DNS.
+
+---
+
+# Existing Portfolio
+
+I already have:
+
+velrite.github.io
+
+That remains my personal engineering portfolio.
+
+Do NOT merge it into velrite.com.
+
+Velrite.com represents the consultancy/company.
+
+The GitHub portfolio represents me as an engineer.
+
+These are two separate brands.
+
+---
+
+# Website Structure
+
+Build the following pages:
+
+Home
+
+About
+
+Services
+
+Platform Engineering
+
+DevSecOps
+
+Cloud Infrastructure
+
+Systems Engineering
+
+Case Studies
+
+Blog
+
+Insights
+
+Contact
+
+Privacy Policy
+
+Terms
+
+404 Page
+
+---
+
+# Homepage Hero
+
+Headline should communicate enterprise value.
+
+Example tone:
+
+"We Design Secure Cloud Platforms That Scale."
+
+Subheading should clearly explain the business value.
+
+Primary CTA:
+
+Book a Discovery Call
+
+Secondary CTA:
+
+View Case Studies
+
+---
+
+# Services
+
+Cover areas such as:
+
+Platform Engineering
+
+Internal Developer Platforms
+
+Kubernetes
+
+Cloud Architecture
+
+Infrastructure as Code
+
+Terraform
+
+GitOps
+
+CI/CD
+
+Security Automation
+
+Compliance
+
+Cloud Migration
+
+Infrastructure Modernization
+
+Observability
+
+Monitoring
+
+Incident Response
+
+Linux Infrastructure
+
+Container Platforms
+
+Automation
+
+Reliability Engineering
+
+Disaster Recovery
+
+Cloud Cost Optimization
+
+---
+
+# Content Strategy
+
+The website must educate enterprise buyers.
+
+Every page should answer:
+
+Why should a CTO trust Velrite?
+
+How do we reduce risk?
+
+How do we improve reliability?
+
+How do we improve deployment speed?
+
+How do we secure infrastructure?
+
+---
+
+# Blog Strategy
+
+Create a professional technical blog.
+
+Topics include:
+
+Platform Engineering
+
+Terraform
+
+GitOps
+
+Kubernetes
+
+AWS
+
+Azure
+
+Linux
+
+DevSecOps
+
+Cloud Security
+
+Infrastructure Automation
+
+Observability
+
+CI/CD
+
+Security
+
+SRE
+
+Incident Management
+
+Cost Optimization
+
+Enterprise Architecture
+
+Every article should be SEO optimized.
+
+---
+
+# SEO
+
+Implement:
+
+Meta titles
+
+Meta descriptions
+
+Open Graph
+
+Twitter Cards
+
+Structured Data
+
+Sitemap
+
+Robots.txt
+
+Canonical URLs
+
+Semantic HTML
+
+Excellent internal linking
+
+Fast page speed
+
+---
+
+# Performance
+
+Optimize:
+
+Images
+
+Fonts
+
+JavaScript
+
+CSS
+
+Caching
+
+Lazy loading
+
+Accessibility
+
+Core Web Vitals
+
+Lighthouse score
+
+---
+
+# Contact Page
+
+Professional contact form.
+
+Business email.
+
+LinkedIn placeholder.
+
+GitHub link.
+
+Response expectation.
+
+Professional call-to-action.
+
+---
+
+# Future Expansion
+
+Design the architecture so it can later support:
+
+docs.velrite.com
+
+academy.velrite.com
+
+status.velrite.com
+
+labs.velrite.com
+
+api.velrite.com
+
+careers.velrite.com
+
+without redesigning the site.
+
+---
+
+# Case Studies
+
+Create realistic layouts for:
+
+Cloud Migration
+
+Platform Engineering
+
+DevSecOps Transformation
+
+CI/CD Modernization
+
+Infrastructure Automation
+
+Security Hardening
+
+Even if projects are personal labs, present them professionally while clearly avoiding false claims.
+
+Never fabricate client names or results.
+
+---
+
+# Writing Style
+
+Professional.
+
+Confident.
+
+Enterprise-focused.
+
+Clear.
+
+Simple.
+
+Never use buzzwords without explanation.
+
+Always explain business value.
+
+---
+
+# Development Workflow
+
+This is critical.
+
+Guide me one step at a time.
+
+For every step:
+
+1. Explain what we're doing.
+2. Explain why.
+3. Show exactly what to click or type.
+4. Wait for my confirmation before continuing.
+5. If I make a mistake, help me fix it.
+6. Never skip steps.
+
+Do not overwhelm me with information.
+
+Treat this like a structured mentorship program that results in a production-ready consultancy website.
+
+Our objective is not simply to launch a website.
+
+Our objective is to build an enterprise-grade digital presence that inspires confidence and helps Velrite grow from a solo consultancy into a respected Platform Engineering and DevSecOps company capable of winning high-value infrastructure contracts.
+
+
+
+# Google Search & SEO Launch Plan (Must Be Done After Website Completion)
+
+After the website is fully built and deployed, do NOT stop.
+
+Continue guiding me step by step through making Velrite discoverable on Google and optimizing it for long-term search rankings.
+
+Assume I have never done SEO before.
+
+Explain every step like you're teaching a beginner.
+
+Wait for my confirmation before moving to the next step.
+
+Cover everything required, including but not limited to:
+
+## Google Search Console
+
+* Create and configure Google Search Console.
+* Verify ownership of velrite.com using the easiest free method.
+* Explain each verification option.
+* Submit the sitemap.
+* Request indexing for important pages.
+* Monitor indexing status.
+* Explain how to fix common indexing issues.
+
+## Bing Webmaster Tools
+
+* Connect Bing Webmaster Tools.
+* Import settings from Google Search Console if possible.
+* Submit the sitemap.
+* Verify indexing.
+
+## Sitemap
+
+* Ensure sitemap.xml is automatically generated.
+* Verify that all important pages are included.
+* Explain how to check that Google can access it.
+
+## Robots.txt
+
+* Create and validate robots.txt.
+* Ensure search engines can crawl all public pages.
+
+## Structured Data (Schema)
+
+Implement and validate structured data for:
+
+* Organization
+* Professional Service
+* Website
+* WebPage
+* Breadcrumbs
+* BlogPosting
+* FAQ (where appropriate)
+
+Test everything using Google's Rich Results Test.
+
+## Analytics
+
+Set up Google Analytics 4 (GA4).
+
+Explain:
+
+* How to create the property.
+* How to connect it.
+* How to verify it is collecting data.
+* How to understand the most important reports.
+
+## Technical SEO
+
+Verify:
+
+* Mobile friendliness.
+* Core Web Vitals.
+* PageSpeed Insights.
+* Lighthouse score.
+* Accessibility.
+* Canonical URLs.
+* Open Graph.
+* Twitter Cards.
+* Meta titles.
+* Meta descriptions.
+* Image optimization.
+* Internal linking.
+* URL structure.
+* Heading hierarchy.
+
+## Local Business Presence (Future)
+
+Prepare the website so it can later connect to:
+
+* Google Business Profile.
+* Business citations.
+* Maps listings.
+
+Do not fabricate business information.
+
+## Content Strategy
+
+Help me build topical authority by planning at least 100 high-quality technical blog articles around:
+
+* Platform Engineering
+* DevSecOps
+* Kubernetes
+* Terraform
+* AWS
+* Azure
+* Linux
+* CI/CD
+* Cloud Security
+* Infrastructure as Code
+* GitOps
+* Observability
+* SRE
+* Cloud Architecture
+* Enterprise Infrastructure
+
+Group these into content clusters that strengthen SEO over time.
+
+## Domain Authority
+
+Teach me ethical (white-hat) methods to increase domain authority, including:
+
+* Technical articles.
+* Open-source projects.
+* Documentation.
+* Guest posts.
+* Quality backlinks.
+* Internal linking.
+* Digital PR.
+* Community contributions.
+
+Never recommend spam, paid backlinks, link farms, keyword stuffing, or any black-hat SEO techniques.
+
+## Ongoing SEO Checklist
+
+Create a recurring weekly and monthly SEO maintenance checklist that includes:
+
+* Publishing new content.
+* Monitoring rankings.
+* Checking indexing.
+* Fixing broken links.
+* Updating older articles.
+* Reviewing Search Console issues.
+* Improving page performance.
+* Monitoring Core Web Vitals.
+* Tracking organic traffic growth.
+
+The objective is to build Velrite into a trusted authority in Platform Engineering, DevSecOps, Systems Engineering, and Cloud Infrastructure, with sustainable long-term organic search growth through ethical SEO best practices.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # my research 
 This is much stronger if it's organized into a master strategy document instead of repeating the same ideas. Here's a condensed version that preserves the important points.
 Platform Engineering Master Plan
