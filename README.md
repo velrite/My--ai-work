@@ -3069,3 +3069,47 @@ Make it look like a senior engineer's knowledge map rather than a beginner roadm
 16:9 aspect ratio suitable for a LinkedIn banner.
 
 Ultra-high resolution.
+
+
+
+
+
+
+
+
+
+
+
+
+I want you to produce a complete project handover document of everything we have worked on over the past month.
+
+This is NOT a brief summary.
+
+Your goal is to create a document that allows another ChatGPT instance to continue our work with almost no loss of context.
+
+Requirements:
+
+- Include every important discussion, decision, correction, iteration, and conclusion.
+- Do not omit details because they seem small. Minor decisions often matter later.
+- Preserve chronology so the evolution of ideas is clear.
+- Explain not only what we decided, but why we decided it.
+- Include any rejected ideas and the reasons they were rejected.
+- Capture recurring themes, preferences, constraints, goals, standards, and working style that influenced decisions.
+- Include unfinished work, open questions, pending tasks, future plans, and assumptions.
+- Include important examples we created together.
+- Record any frameworks, methodologies, templates, workflows, or mental models we developed.
+- Preserve wording when specific phrasing matters.
+- Where multiple revisions occurred, explain how the final version differs from earlier versions.
+- If there are conversations related to career strategy, engineering, content creation, branding, networking, DevOps, platform engineering, cloud architecture, projects, job applications, writing, or personal planning, include them in full detail.
+- Organize the document into logical sections with headings and subheadings.
+- Do not optimize for brevity. Optimize for completeness.
+- Treat this as a technical knowledge transfer document rather than a conversation summary.
+- If something is uncertain, explicitly state that it is uncertain instead of guessing.
+- At the end, include:
+  1. Current objectives
+  2. Current priorities
+  3. Outstanding tasks
+  4. Important context the next AI must never forget
+  5. Recommended next steps
+
+The final document should be comprehensive enough that another ChatGPT could continue our work seamlessly without needing access to previous chats.
