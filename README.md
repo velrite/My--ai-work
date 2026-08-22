@@ -262,7 +262,1264 @@ Suggest chaos testing where appropriate.
 
 
 
+ # ROLE
 
+Act as a Principal Platform Engineer, SRE, DevSecOps Architect, Technical Writer, and Production Systems Reviewer.
+
+Your task is to take the provided Platform Engineering project/repository and transform its documentation into production-grade engineering documentation.
+
+Do not produce generic documentation.
+
+The documentation must demonstrate that the engineer understands:
+
+- Systems architecture
+- Cloud infrastructure
+- Kubernetes
+- Infrastructure as Code
+- CI/CD
+- Platform Engineering
+- DevSecOps
+- Reliability Engineering
+- Observability
+- Security
+- Disaster Recovery
+- Performance engineering
+- Capacity planning
+- FinOps
+- Incident response
+- Failure analysis
+- Operational maturity
+
+The final result should look like documentation produced by a Senior/Staff/Principal Platform Engineer working on a real production platform.
+
+---
+
+CORE RULES
+
+1. Do not invent facts
+
+Use only information that can be verified from:
+
+- Repository files
+- Configuration
+- Terraform
+- Kubernetes manifests
+- Helm charts
+- CI/CD pipelines
+- Application code
+- Scripts
+- Monitoring configuration
+- Tests
+- Existing documentation
+- Explicit information provided by me
+
+If something is not implemented or cannot be verified, explicitly mark it:
+
+«Not implemented»
+
+or:
+
+«Not verified from the repository»
+
+or:
+
+«Proposed improvement»
+
+Never fabricate:
+
+- Performance numbers
+- Availability
+- Cost
+- RTO/RPO
+- Security controls
+- Cloud resources
+- Failure-test results
+- Load-test results
+- Infrastructure capacity
+- Business impact
+
+---
+
+2. Inspect the entire repository first
+
+Before writing documentation, analyze the repository systematically.
+
+Inspect:
+
+- Directory structure
+- README
+- Source code
+- Terraform
+- Kubernetes manifests
+- Helm charts
+- Dockerfiles
+- CI/CD configuration
+- GitHub/GitLab workflows
+- Ansible
+- Scripts
+- Monitoring configuration
+- Prometheus
+- Grafana
+- OpenTelemetry
+- Logging configuration
+- Vault
+- IAM/RBAC
+- Network configuration
+- Tests
+- Documentation
+- Environment configuration
+
+Determine:
+
+1. What the system does
+2. How components communicate
+3. How infrastructure is provisioned
+4. How applications are deployed
+5. How secrets are managed
+6. How the system is monitored
+7. How failures are handled
+8. What security controls exist
+9. What scaling mechanisms exist
+10. What is missing
+
+Only after this analysis should documentation be generated.
+
+---
+
+3. Separate FACTS from ASSUMPTIONS
+
+For every major architectural statement, distinguish between:
+
+Verified
+
+Directly supported by repository evidence.
+
+Inferred
+
+Reasonably inferred from implementation but not explicitly documented.
+
+Proposed
+
+A recommended improvement that does not currently exist.
+
+Do not present inferred or proposed architecture as implemented architecture.
+
+---
+
+DOCUMENTATION OBJECTIVE
+
+Create documentation that answers these questions:
+
+Architecture
+
+- What problem does this system solve?
+- What does the architecture look like?
+- Why was it designed this way?
+- What are the major components?
+- What are the dependencies?
+- What are the system boundaries?
+
+Infrastructure
+
+- What infrastructure exists?
+- How is it provisioned?
+- How is it configured?
+- How is it changed safely?
+
+Security
+
+- How are users authenticated?
+- How are workloads authenticated?
+- How is authorization enforced?
+- How are secrets handled?
+- How are credentials rotated?
+- What are the major threats?
+- What happens if credentials are compromised?
+
+Delivery
+
+- How does code move from commit to production?
+- What quality gates exist?
+- How are artifacts built?
+- How are deployments performed?
+- How does rollback work?
+
+Reliability
+
+- What happens when components fail?
+- What happens when a node dies?
+- What happens when a deployment is broken?
+- What happens when dependencies fail?
+- How is recovery performed?
+
+Observability
+
+- What metrics exist?
+- What logs exist?
+- What traces exist?
+- What alerts exist?
+- What SLIs/SLOs exist?
+
+Performance
+
+- What are the bottlenecks?
+- How does the system scale?
+- What happens under load?
+- What has actually been measured?
+
+Cost
+
+- What resources cost money?
+- What drives cost?
+- Where can resources be optimized?
+- What is the cost model?
+
+Operations
+
+- How does an engineer troubleshoot the system?
+- How are incidents handled?
+- What runbooks exist?
+- How is maintenance performed?
+
+---
+
+REQUIRED DOCUMENTATION STRUCTURE
+
+Create the documentation in this exact logical order.
+
+---
+
+01 — PROJECT OVERVIEW
+
+Create:
+
+docs/01-overview/
+├── problem-statement.md
+├── requirements.md
+└── goals-and-non-goals.md
+
+problem-statement.md
+
+Explain:
+
+- Existing problem
+- Why the problem matters
+- Operational consequences
+- Engineering constraints
+- Why this platform exists
+
+Do not describe technologies before explaining the problem.
+
+---
+
+requirements.md
+
+Separate requirements into:
+
+Functional requirements
+
+Examples:
+
+- Deployment
+- Service discovery
+- Secrets
+- Monitoring
+- Rollback
+- Scaling
+
+Non-functional requirements
+
+Include where applicable:
+
+- Availability
+- Latency
+- Throughput
+- Scalability
+- Security
+- Recovery
+- Cost
+- Deployment frequency
+
+If actual values are unavailable, state that clearly.
+
+---
+
+goals-and-non-goals.md
+
+Clearly define:
+
+Goals
+
+What the project intentionally solves.
+
+Non-goals
+
+What it intentionally does not solve.
+
+Do not make the project appear larger than it actually is.
+
+---
+
+02 — ARCHITECTURE
+
+Create:
+
+docs/02-architecture/
+├── architecture.md
+├── architecture-decisions.md
+├── network-architecture.md
+├── security-architecture.md
+└── data-flow.md
+
+---
+
+architecture.md
+
+Explain:
+
+- High-level architecture
+- Components
+- Responsibilities
+- Dependencies
+- Communication paths
+- Trust boundaries
+- Failure boundaries
+- Scaling boundaries
+
+Include a clear architecture diagram.
+
+Use Mermaid where appropriate.
+
+Example:
+
+flowchart TD
+    Client --> LoadBalancer
+    LoadBalancer --> Ingress
+    Ingress --> Kubernetes
+    Kubernetes --> Application
+    Application --> Database
+    Application --> Vault
+    Application --> Observability
+
+Only include components actually present in the project.
+
+---
+
+architecture-decisions.md
+
+Document major architectural decisions as ADRs.
+
+For each decision use:
+
+# ADR-001: <Decision>
+
+## Context
+
+What problem existed?
+
+## Options Considered
+
+1. Option A
+2. Option B
+3. Option C
+
+## Decision
+
+What was selected?
+
+## Rationale
+
+Why?
+
+## Trade-offs
+
+What was sacrificed?
+
+## Consequences
+
+What does this decision mean operationally?
+
+Create ADRs for important decisions such as:
+
+- Kubernetes
+- Terraform
+- Vault
+- GitOps
+- CI/CD strategy
+- Deployment strategy
+- Observability stack
+- Database architecture
+- Networking
+- Security architecture
+
+Only create ADRs for decisions supported by the project.
+
+---
+
+network-architecture.md
+
+Document:
+
+- VPC/VNet
+- Subnets
+- Routing
+- Load balancers
+- Ingress
+- DNS
+- Security groups
+- Network policies
+- Public/private boundaries
+- East-west traffic
+- North-south traffic
+
+Include a network diagram.
+
+---
+
+security-architecture.md
+
+Document:
+
+- Trust boundaries
+- Authentication
+- Authorization
+- IAM
+- RBAC
+- Service identities
+- Secrets
+- Encryption
+- Network security
+- Container security
+- Supply-chain security
+
+Explain how security controls interact rather than simply listing tools.
+
+---
+
+data-flow.md
+
+Show important request/data paths.
+
+Example:
+
+Client
+ ↓
+Load Balancer
+ ↓
+Ingress
+ ↓
+Service
+ ↓
+Database
+
+For asynchronous systems, show queues/events/workers.
+
+---
+
+03 — INFRASTRUCTURE
+
+Create:
+
+docs/03-infrastructure/
+├── compute.md
+├── kubernetes.md
+├── networking.md
+├── storage.md
+└── infrastructure-as-code.md
+
+Document actual infrastructure.
+
+Explain:
+
+- Resource purpose
+- Configuration
+- Dependencies
+- Scaling
+- Failure behavior
+- Lifecycle management
+
+For Kubernetes include:
+
+- Cluster topology
+- Namespaces
+- Deployments
+- Services
+- Ingress
+- ConfigMaps
+- Secrets
+- RBAC
+- NetworkPolicies
+- HPA
+- PDB
+- StatefulSets
+- Scheduling
+- Resource requests/limits
+- Affinity/anti-affinity
+- Topology spread constraints
+
+Only document resources actually implemented.
+
+---
+
+04 — DELIVERY AND CI/CD
+
+Create:
+
+docs/04-delivery/
+├── ci-cd.md
+├── deployment-strategy.md
+├── rollback.md
+└── release-process.md
+
+Explain the complete path:
+
+Commit
+ ↓
+Validation
+ ↓
+Tests
+ ↓
+Security scanning
+ ↓
+Build
+ ↓
+Artifact
+ ↓
+Deployment
+ ↓
+Verification
+ ↓
+Promotion
+
+Document:
+
+- Pipeline stages
+- Quality gates
+- Security gates
+- Artifact management
+- Environment promotion
+- Deployment strategy
+- Canary/blue-green/rolling deployment
+- Automated rollback
+- Manual approval points
+
+Include the actual pipeline architecture.
+
+---
+
+05 — SECURITY
+
+Create:
+
+docs/05-security/
+├── threat-model.md
+├── identity-and-access.md
+├── secrets-management.md
+└── supply-chain-security.md
+
+---
+
+threat-model.md
+
+Identify:
+
+- Assets
+- Attack surfaces
+- Trust boundaries
+- Threat actors
+- Major threats
+- Mitigations
+
+Use STRIDE or another appropriate methodology where useful.
+
+---
+
+identity-and-access.md
+
+Explain:
+
+- Human access
+- Machine access
+- Workload identity
+- IAM
+- Kubernetes RBAC
+- Least privilege
+- Privilege boundaries
+
+---
+
+secrets-management.md
+
+Explain:
+
+- Where secrets originate
+- Where they are stored
+- How applications retrieve them
+- Secret lifetime
+- Rotation
+- Revocation
+- Access control
+
+If Vault exists, explain the actual Vault architecture.
+
+---
+
+supply-chain-security.md
+
+Document actual controls such as:
+
+- Image scanning
+- Dependency scanning
+- SBOM
+- Signed artifacts
+- Registry security
+- CI security
+- Secret scanning
+
+Do not claim controls that are not implemented.
+
+---
+
+06 — OBSERVABILITY
+
+Create:
+
+docs/06-observability/
+├── monitoring.md
+├── logging.md
+├── tracing.md
+├── alerting.md
+└── slo-sli.md
+
+Document:
+
+Metrics
+
+- Golden signals
+- Infrastructure metrics
+- Application metrics
+- Kubernetes metrics
+
+Logging
+
+- Collection
+- Aggregation
+- Retention
+- Structured logs
+- Correlation
+
+Tracing
+
+Document OpenTelemetry/distributed tracing if implemented.
+
+Alerting
+
+Explain:
+
+- Alert conditions
+- Severity
+- Routing
+- Escalation
+- Noise reduction
+
+SLI/SLO
+
+Define actual SLOs if they exist.
+
+If they don't exist:
+
+«SLOs are not currently implemented.»
+
+Then optionally provide a clearly labeled proposed model.
+
+---
+
+07 — RELIABILITY
+
+Create:
+
+docs/07-reliability/
+├── failure-modes.md
+├── disaster-recovery.md
+├── backup-restore.md
+├── chaos-testing.md
+└── capacity-planning.md
+
+---
+
+failure-modes.md
+
+Create a failure matrix:
+
+Failure| Detection| Expected behavior| Actual behavior| Recovery
+
+Document failures such as:
+
+- Pod crash
+- Node failure
+- Network failure
+- Database failure
+- Dependency failure
+- Deployment failure
+- Credential failure
+- Storage failure
+
+Only include tests that actually occurred under "Actual behavior."
+
+---
+
+disaster-recovery.md
+
+Document:
+
+- RTO
+- RPO
+- Backup strategy
+- Recovery architecture
+- Dependencies
+- Recovery procedure
+- Single points of failure
+
+If RTO/RPO are not measured, say so.
+
+---
+
+backup-restore.md
+
+Document:
+
+- Backup frequency
+- Storage
+- Encryption
+- Retention
+- Restore process
+- Restore verification
+
+Important:
+
+A backup is not considered reliable until restoration has been tested.
+
+---
+
+chaos-testing.md
+
+Document actual failure injection.
+
+For every test:
+
+Test name:
+Objective:
+Failure injected:
+Expected result:
+Actual result:
+Detection time:
+Recovery time:
+Impact:
+Lessons:
+
+---
+
+capacity-planning.md
+
+Document:
+
+- Resource limits
+- Scaling thresholds
+- Bottlenecks
+- CPU
+- Memory
+- Network
+- Database
+- Queueing
+- Storage
+
+Use actual benchmark data where available.
+
+---
+
+08 — FINOPS
+
+Create:
+
+docs/08-finops/
+├── cost-model.md
+├── cost-breakdown.md
+└── optimization.md
+
+Document:
+
+- Infrastructure cost
+- Compute cost
+- Storage
+- Network
+- Database
+- Observability
+- CI/CD
+
+Where possible calculate:
+
+Total monthly cost
+Cost per workload
+Cost per environment
+Cost per request
+
+Document optimization decisions.
+
+Never fabricate pricing.
+
+---
+
+09 — OPERATIONS
+
+Create:
+
+docs/09-operations/
+├── incident-response.md
+├── troubleshooting.md
+├── maintenance.md
+└── runbooks/
+
+Create runbooks for relevant operational failures.
+
+Examples:
+
+runbooks/
+├── pod-crashloop.md
+├── node-failure.md
+├── failed-deployment.md
+├── high-latency.md
+├── high-error-rate.md
+├── database-failure.md
+├── certificate-expiration.md
+├── disk-pressure.md
+└── secret-rotation.md
+
+Every runbook should contain:
+
+Symptoms
+↓
+Initial checks
+↓
+Diagnosis
+↓
+Decision points
+↓
+Remediation
+↓
+Verification
+↓
+Escalation
+
+Use real commands from the project where possible.
+
+---
+
+10 — EVIDENCE
+
+Create:
+
+docs/10-evidence/
+├── benchmarks.md
+├── load-testing.md
+├── failure-testing.md
+└── screenshots.md
+
+This section must prove the claims made elsewhere.
+
+Include evidence such as:
+
+- CI/CD screenshots
+- Grafana dashboards
+- Kubernetes status
+- Terraform plans
+- Deployment results
+- Rollback results
+- Load tests
+- Failure tests
+- Recovery tests
+- Logs
+- Alerts
+
+Never expose:
+
+- Passwords
+- API keys
+- Tokens
+- Private credentials
+- Sensitive infrastructure details
+
+---
+
+ROOT DOCUMENTATION
+
+Also create/update:
+
+README.md
+SECURITY.md
+CONTRIBUTING.md
+CHANGELOG.md
+
+---
+
+README STRUCTURE
+
+The README must be concise compared with the detailed documentation.
+
+Use this order:
+
+# Project Name
+
+## Overview
+
+## Problem
+
+## Architecture
+
+[Architecture diagram]
+
+## Key Engineering Decisions
+
+## Technology Stack
+
+## Reliability
+
+## Security
+
+## Observability
+
+## CI/CD
+
+## Performance
+
+## Cost
+
+## Failure Testing
+
+## Repository Structure
+
+## Quick Start
+
+## Documentation
+
+## Limitations
+
+## Future Improvements
+
+## Engineering Lessons
+
+The README should function as the executive entry point into the project.
+
+---
+
+TECHNOLOGY MATRIX
+
+Include a table like:
+
+Layer| Technology| Purpose
+Cloud| ...| ...
+IaC| ...| ...
+Containers| ...| ...
+Orchestration| ...| ...
+CI/CD| ...| ...
+Secrets| ...| ...
+Monitoring| ...| ...
+Logging| ...| ...
+Tracing| ...| ...
+Security| ...| ...
+
+Populate only technologies actually present.
+
+---
+
+ENGINEERING CONTRIBUTION
+
+Include a section clearly identifying what the engineer designed, implemented, tested, and operated.
+
+Separate:
+
+Designed
+
+Implemented
+
+Automated
+
+Tested
+
+Operated
+
+Measured
+
+Do not exaggerate ownership.
+
+---
+
+TRADE-OFFS
+
+Every major architecture should discuss trade-offs.
+
+For example:
+
+Decision:
+Use Kubernetes.
+
+Benefits:
+...
+
+Costs:
+...
+
+Operational complexity:
+...
+
+Alternative:
+...
+
+Why Kubernetes was selected:
+...
+
+The objective is to demonstrate engineering judgment, not technology worship.
+
+---
+
+LIMITATIONS
+
+Explicitly document:
+
+- Current limitations
+- Single points of failure
+- Missing automation
+- Scalability limits
+- Security gaps
+- Observability gaps
+- Cost limitations
+- Operational risks
+
+Never hide weaknesses.
+
+---
+
+FUTURE IMPROVEMENTS
+
+Separate future improvements from implemented functionality.
+
+Use categories:
+
+Reliability
+
+Security
+
+Scalability
+
+Performance
+
+Cost
+
+Developer Experience
+
+Automation
+
+Do not present future work as existing functionality.
+
+---
+
+ENGINEERING LESSONS
+
+End with technically meaningful lessons.
+
+Avoid statements such as:
+
+«I learned Kubernetes.»
+
+Instead explain concrete engineering discoveries.
+
+Example:
+
+«Node-level self-healing did not guarantee application-level availability because replica placement was not sufficiently distributed. Failure testing exposed this dependency, leading to topology-aware scheduling requirements.»
+
+Lessons should be based on actual project evidence.
+
+---
+
+DOCUMENTATION QUALITY STANDARD
+
+The documentation must satisfy these principles:
+
+Precision
+
+Use exact technical terminology.
+
+Evidence
+
+Back claims with repository evidence or measurements.
+
+Traceability
+
+A reader should be able to move from:
+
+Requirement
+↓
+Architecture decision
+↓
+Implementation
+↓
+Test
+↓
+Evidence
+
+Operational realism
+
+Explain what happens at 2 AM when something breaks.
+
+Failure-oriented thinking
+
+Do not only explain the happy path.
+
+Security-oriented thinking
+
+Assume credentials, dependencies, networks, and workloads can fail or be compromised.
+
+Cost awareness
+
+Treat infrastructure cost as an engineering constraint.
+
+Scalability awareness
+
+Explain where the architecture stops scaling.
+
+---
+
+DIAGRAM REQUIREMENTS
+
+Use diagrams wherever they significantly improve understanding.
+
+Create diagrams for:
+
+1. High-level architecture
+2. Network architecture
+3. Kubernetes architecture
+4. CI/CD pipeline
+5. Request/data flow
+6. Security/trust boundaries
+7. Observability architecture
+8. Failure/recovery flow
+
+Prefer Mermaid so diagrams remain version-controlled.
+
+---
+
+IMPORTANT: DO NOT OVER-DOCUMENT
+
+Documentation should reflect the actual complexity of the project.
+
+Do not create meaningless pages just to satisfy this structure.
+
+If a section is irrelevant, explicitly state:
+
+«Not applicable to this architecture.»
+
+If functionality is absent:
+
+«Not implemented.»
+
+If functionality is planned:
+
+«Proposed.»
+
+---
+
+FINAL REVIEW
+
+After generating the documentation, perform a final Principal Engineer documentation audit.
+
+Check:
+
+Architecture
+
+- Is the architecture understandable?
+- Are boundaries clear?
+- Are dependencies documented?
+- Are trade-offs explained?
+
+Security
+
+- Are trust boundaries documented?
+- Is least privilege addressed?
+- Are secrets handled correctly?
+- Are attack surfaces identified?
+
+Reliability
+
+- Are failure modes documented?
+- Is recovery explained?
+- Are backups tested?
+- Are RTO/RPO known?
+
+Observability
+
+- Can an engineer determine whether the system is healthy?
+- Are golden signals covered?
+- Are alerts tied to meaningful failures?
+
+CI/CD
+
+- Is the deployment lifecycle clear?
+- Is rollback explained?
+- Are security gates documented?
+
+Performance
+
+- Are actual measurements separated from assumptions?
+- Are bottlenecks known?
+- Is capacity understood?
+
+FinOps
+
+- Is cost understood?
+- Are optimization opportunities documented?
+
+Operations
+
+- Could another engineer operate the system using the documentation?
+- Are runbooks actionable?
+- Can an engineer troubleshoot a failure?
+
+Evidence
+
+- Are major claims supported by evidence?
+- Are screenshots/test results available?
+- Are fabricated claims absent?
+
+---
+
+FINAL OUTPUT
+
+Produce:
+
+1. Complete documentation structure
+2. README.md
+3. All relevant documentation files
+4. Architecture diagrams
+5. ADRs
+6. Operational runbooks
+7. Failure-mode documentation
+8. Security documentation
+9. Observability documentation
+10. CI/CD documentation
+11. Performance/load-testing documentation
+12. FinOps documentation
+13. Disaster-recovery documentation
+14. Engineering lessons
+15. Limitations and future improvements
+
+The final documentation should make the project readable as a real production engineering system, not as a tutorial or school project.
+
+The standard is:
+
+«Show the problem. Show the architecture. Explain the decisions. Show the implementation. Prove the behavior. Explain failure. Quantify performance and cost where possible. Document operations. Expose limitations.»
+
+Do not optimize the documentation for sounding impressive.
+
+Optimize it for being technically credible, operationally useful, and reviewable by a senior engineering team.
 
 
 
