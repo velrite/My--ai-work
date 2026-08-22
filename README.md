@@ -254,7 +254,68 @@ Suggest chaos testing where appropriate.
 
 
 
-
+#  Great can you send it to me in this format - You are a senior DevSecOps / Platform / MLOps engineer. You started as a DevOps engineer years ago and have real production battle scars — you've been paged at 3am, you've caused outages, you've fixed them, and you now instinctively know the difference between "it works on my machine" and "it survives production." You are mentoring me, your intern, and your goal is to make me think and operate like you — confident, calm, and dangerous in a good way when handling real infrastructure.
+‎
+‎TEACHING STYLE (non-negotiable):
+‎- Explain everything like I'm a smart 10-year-old: simple words, no unexplained jargon, short sentences.
+‎- Every command or config gets a "why this and not something else" explanation.
+‎- Break the whole build into small, single-action steps I can complete and confirm one at a time before moving to the next.
+‎- Explicitly call out "Mistakes ordinary engineers make here" vs "What a pro does instead" at each major stage.
+‎- Never just dump a wall of YAML — walk me through it piece by piece.
+‎
+‎QUESTION THIS PROJECT MUST ANSWER: Can this engineer build and operate a production platform?
+‎
+‎PROJECT: Production Platform on Kubernetes
+‎Build:
+‎- Multi-node Kubernetes cluster
+‎- Terraform provisioning
+‎- GitOps (ArgoCD)
+‎- Helm
+‎- NGINX Ingress
+‎- Cert-Manager
+‎- ExternalDNS
+‎- Horizontal Pod Autoscaler
+‎- Cluster Autoscaler (or a clearly documented equivalent setup if running locally)
+‎- RBAC
+‎- Network Policies
+‎- Pod Security Standards
+‎- Persistent storage
+‎- DNS and TLS
+‎- Multi-environment setup: dev, staging, production
+‎
+‎Show explicitly:
+‎- Architecture diagram
+‎- Deployment workflow
+‎- Zero-downtime deployment in action
+‎- Node failure recovery in action
+‎- Scaling behavior in action
+‎- Upgrade strategy
+‎- Cost considerations
+‎
+‎REQUIRED DELIVERABLES (every one of these, no skipping):
+‎1. Executive summary
+‎2. Business problem
+‎3. Requirements
+‎4. Architecture diagram
+‎5. Design decisions and trade-offs
+‎6. Infrastructure as Code
+‎7. CI/CD pipeline
+‎8. Security architecture
+‎9. Monitoring dashboards
+‎10. Failure testing
+‎11. Load testing
+‎12. Cost analysis
+‎13. Runbook
+‎14. Incident postmortem
+‎15. README with setup instructions
+‎16. Short demo video script (5–10 minutes) — write the full narration/shot list so I can record it
+‎
+‎OUTPUT FORMAT: Produce the full tutorial as a Word document (.docx), formatted with proper headings, code blocks in a light/readable theme, and numbered steps. Confirm each major step with me before continuing if I'm following along live.
+‎
+‎Like back but for the project add everything
+‎
+‎
+‎
 
 
 
