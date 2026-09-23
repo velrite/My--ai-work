@@ -1,5 +1,1135 @@
-# upgrade 2
-## third edits
+# SCREENSHOT 
+You already have full knowledge of this project. You have read and understood the repository, source code, infrastructure, Terraform, Kubernetes manifests, Helm charts, CI/CD, GitOps configuration, security controls, observability, ADRs, runbooks, architecture, and previous implementation decisions.
+
+The project is now BUILT.
+
+We are entering the final EVIDENCE COLLECTION phase.
+
+Your job is to help me collect real, publishable evidence that proves the important parts of this project actually exist and work.
+
+Do not write a tutorial.
+Do not redesign the project.
+Do not invent functionality.
+Do not fabricate command output.
+Do not assume that code existing means the feature works.
+
+Think like a skeptical Staff/Principal Engineer reviewing this repository and asking:
+
+"How do I know this was actually built?"
+
+Then design the evidence required to answer that question.
+
+━━━━━━━━━━━━━━━━━━━━
+CORE OBJECTIVE
+━━━━━━━━━━━━━━━━━━━━
+
+Create approximately 20–30 high-value evidence captures for this project.
+
+The exact number is flexible.
+
+If 18 excellent screenshots prove everything important, do not manufacture 12 more.
+
+If 30 are genuinely necessary because the project contains many independent capabilities, use 30.
+
+Every screenshot must have a purpose.
+
+The final evidence should allow a reviewer to follow:
+
+CLAIM
+→ IMPLEMENTATION
+→ REAL SYSTEM OUTPUT
+→ VERIFICATION
+→ DOCUMENTATION
+
+The screenshots will eventually be stored inside the repository and referenced from the README and technical documentation.
+
+The filenames therefore need to be deliberate and stable.
+
+━━━━━━━━━━━━━━━━━━━━
+FIRST: AUDIT THE PROJECT
+━━━━━━━━━━━━━━━━━━━━
+
+Before producing the evidence list, internally map the project.
+
+Identify:
+
+• What was actually implemented.
+• What is currently deployed.
+• What can be verified from a live environment.
+• What can be verified from CI/CD.
+• What can be verified from the cloud provider.
+• What can be verified from Kubernetes.
+• What can be verified from dashboards.
+• What can be verified from logs/metrics/traces.
+• What can be verified from Git history or repository configuration.
+• What was tested experimentally.
+• What is documented but not currently demonstrable.
+• What claims are stronger than the available evidence.
+
+Do not create evidence for functionality that does not exist.
+
+If documentation claims something that cannot currently be proven, flag it rather than pretending.
+
+━━━━━━━━━━━━━━━━━━━━
+EVIDENCE PRIORITY
+━━━━━━━━━━━━━━━━━━━━
+
+Prioritize evidence in this order:
+
+1. REAL SYSTEM BEHAVIOR
+2. REAL RUNTIME STATE
+3. REAL CI/CD EXECUTION
+4. REAL INFRASTRUCTURE STATE
+5. CONFIGURATION / IMPLEMENTATION
+6. STATIC CODE
+
+A screenshot showing a system actually behaving correctly is generally more valuable than a screenshot showing configuration that says it should behave correctly.
+
+For example:
+
+Weak:
+A YAML file showing an HPA configuration.
+
+Strong:
+The workload under load, followed by replica scaling.
+
+Weak:
+A canary configuration file.
+
+Strong:
+A real rollout progressing through stages and successfully completing or rolling back.
+
+Weak:
+A Vault configuration.
+
+Strong:
+Evidence showing the intended identity/authentication flow and resulting secret behavior without exposing credentials.
+
+Use static configuration evidence when behavioral evidence is impossible or when the configuration itself is important evidence.
+
+━━━━━━━━━━━━━━━━━━━━
+WHAT EACH EVIDENCE ITEM MUST CONTAIN
+━━━━━━━━━━━━━━━━━━━━
+
+For every proposed screenshot, give me ALL of the following.
+
+1. Evidence number
+
+Use:
+
+01
+02
+03
+...
+
+Keep the numbering stable.
+
+2. Evidence title
+
+Use a concise technical name.
+
+Examples:
+
+Cluster Nodes
+Argo CD Application Health
+GitLab Pipeline
+Container Image Scan
+SBOM Generation
+Canary Rollout
+Automatic Recovery
+SLO Dashboard
+
+Avoid vague names such as:
+
+Proof
+Screenshot
+System Test
+Final Result
+
+3. What this proves
+
+Explain the exact engineering claim being proven.
+
+Example:
+
+"Proves that the deployed Kubernetes workload is running with the expected replica count and that the cluster nodes are currently Ready."
+
+4. Why this evidence is necessary
+
+Explain what a skeptical reviewer would otherwise have to take on faith.
+
+5. Exact commands
+
+Give me the commands I should copy and paste.
+
+Use the actual project details you already know.
+
+If Kubernetes is involved, do not assume my context.
+
+Where appropriate, begin with:
+
+kubectl config current-context
+
+Then verify the expected context before running commands that could affect anything.
+
+Use the actual namespaces, deployments, services, applications, clusters, repositories, cloud resources, etc. from this project.
+
+Do not give placeholder commands such as:
+
+kubectl get <your-resource>
+
+unless absolutely unavoidable.
+
+Do not use editor-opening commands.
+
+Avoid kubectl exec unless it is genuinely necessary for the specific proof.
+
+Prefer read-only commands whenever possible.
+
+6. Expected result BEFORE I take the screenshot
+
+Tell me what I should expect to see.
+
+Do not invent exact values that depend on runtime state.
+
+Instead distinguish between:
+
+EXPECTED STRUCTURE
+and
+EXPECTED VALUE.
+
+For example:
+
+"Expected structure: the command should show the deployment with READY equal to the desired replica count and AVAILABLE equal to the desired replica count."
+
+If a specific value is already known from the project, state it.
+
+If the result is different from expectation, tell me NOT to take the screenshot and explain what should be investigated first.
+
+7. Verification checklist
+
+Give me a short checklist:
+
+[ ] Correct environment
+[ ] Correct cluster/context
+[ ] Correct resource
+[ ] Expected status
+[ ] No unexpected error
+[ ] Important output visible
+
+Only after these checks pass should I capture the screenshot.
+
+8. Screenshot composition
+
+Tell me exactly what the screenshot should contain.
+
+For example:
+
+"Capture the entire terminal window. Keep the command visible above the output. Keep the Kubernetes context visible if possible. Do not crop the resource name or status columns."
+
+Or:
+
+"Capture the Grafana dashboard showing the service name, time range, request rate, latency and error-rate panels together."
+
+Useful corroborating evidence but not essential.
+
+15. Dependencies
+
+State what must already be running or configured before I execute the commands.
+
+Examples:
+
+• GKE cluster must exist.
+• Argo CD must be synchronized.
+• GitLab pipeline must have completed.
+• Prometheus data must exist.
+• Load test must be running.
+
+16. Safety
+
+Tell me whether the commands are:
+
+READ-ONLY
+NON-DESTRUCTIVE
+CONTROLLED TEST
+DESTRUCTIVE TEST
+
+For anything potentially disruptive, warn me clearly BEFORE the command.
+
+Never recommend destructive testing merely to obtain a screenshot.
+
+━━━━━━━━━━━━━━━━━━━━
+FAILURE AND RESILIENCE EVIDENCE
+━━━━━━━━━━━━━━━━━━━━
+
+If the project contains resilience, autoscaling, recovery, rollback, HA, disaster recovery, or failure-handling claims, prioritize behavioral evidence.
+
+Where a safe test already exists, structure the evidence as:
+
+1. BASELINE
+2. FAILURE
+3. SYSTEM RESPONSE
+4. RECOVERY
+5. FINAL STATE
+
+For example:
+
+Healthy deployment
+→ deliberately terminate workload
+→ Kubernetes detects desired-state violation
+→ replacement occurs
+→ service returns to healthy state
+
+Do not fabricate a failure.
+
+Do not claim automatic recovery simply because a configuration exists.
+
+If the project has not actually tested a behavior, mark it:
+
+NOT YET VERIFIED
+
+and tell me what evidence would be needed if I later decide to test it.
+
+━━━━━━━━━━━━━━━━━━━━
+SECURITY EVIDENCE
+━━━━━━━━━━━━━━━━━━━━
+
+Pay special attention to security claims.
+
+Look for evidence covering the actual mechanisms implemented, such as:
+
+• image scanning
+• SBOM
+• image signing
+• admission policies
+• secrets management
+• workload identity
+• RBAC
+• network policies
+• least privilege
+• authentication
+• authorization
+• supply-chain controls
+FINAL EVIDENCE MAP
+━━━━━━━━━━━━━━━━━━━━
+
+After designing all evidence items, provide a summary table:
+
+#| Evidence| Capability| What it proves| Strength| Filename
+
+Then provide the complete capture instructions in numerical order.
+
+━━━━━━━━━━━━━━━━━━━━
+FINAL AUDIT
+━━━━━━━━━━━━━━━━━━━━
+
+At the end, perform an evidence audit.
+
+Give me four lists:
+
+PROVEN
+
+Claims that have strong real-world evidence.
+
+PARTIALLY PROVEN
+
+Claims where implementation exists but behavioral evidence is incomplete.
+
+NOT VERIFIED
+
+Capabilities that exist in code/configuration but have not been demonstrated sufficiently.
+
+UNSUPPORTED CLAIMS
+
+Claims in the documentation that should be removed, weakened, or explicitly marked as unverified because the project does not currently provide adequate evidence.
+
+Then identify:
+
+"TOP 10 MOST IMPORTANT SCREENSHOTS"
+
+These are the ten screenshots I absolutely should capture first if time, cloud credits, or infrastructure availability becomes a constraint.
+
+━━━━━━━━━━━━━━━━━━━━
+IMPORTANT STANDARD
+━━━━━━━━━━━━━━━━━━━━
+
+The final repository should not look like a collection of screenshots added to make the project appear impressive.
+
+It should look like an engineer deliberately collected evidence for the claims made in the documentation.
+
+Every important statement should be traceable to evidence.
+
+Every piece of evidence should be traceable to a real system state.
+
+Every screenshot should have a deterministic filename.
+
+Every filename should map cleanly to documentation.
+
+The final standard is:
+
+CLAIM
+→ REAL IMPLEMENTATION
+→ REAL TEST
+→ REAL OUTPUT
+→ SCREENSHOT
+→ DOCUMENTATION
+→ REVIEWER CAN VERIFY IT
+
+Do not optimize for quantity.
+
+Optimize for credibility.
+
+
+The screenshot should contain enough context to establish that the evidence belongs to this project.
+
+Do not optimize screenshots merely for aesthetics.
+
+Optimize them for VERIFIABILITY.
+
+9. Screenshot filename
+
+Give me the exact filename.
+
+Use:
+
+lowercase-kebab-case.png
+
+Examples:
+
+01-cluster-nodes.png
+02-kubernetes-namespaces.png
+03-argocd-application-health.png
+04-gitlab-pipeline-success.png
+
+Never use:
+
+proof.png
+image1.png
+final.png
+new.png
+screenshot123.png
+
+10. Storage path
+
+Use one consistent location unless the repository already has a better established structure.
+
+Prefer:
+
+docs/evidence/
+
+Therefore:
+
+docs/evidence/01-cluster-nodes.png
+
+11. Documentation location
+
+Tell me exactly where the image belongs.
+
+For example:
+
+README.md
+→ Production Platform
+→ Infrastructure
+→ Evidence
+
+or:
+
+docs/observability.md
+→ SLO Monitoring
+→ Evidence
+
+If the current documentation already has a suitable section, use that instead of creating unnecessary new structure.
+
+12. Exact Markdown
+
+Provide the exact Markdown reference that can be pasted into the documentation.
+
+Example:
+
+"Cluster Nodes" (docs/evidence/01-cluster-nodes.png)
+
+The filename in the Markdown MUST exactly match the filename you assigned.
+
+13. Engineering interpretation
+
+Explain in one short paragraph what the screenshot demonstrates technically.
+
+Do not merely repeat what is visible.
+
+Explain why the evidence matters.
+
+14. Evidence strength
+
+Classify it:
+
+CRITICAL
+STRONG
+SUPPORTING
+
+CRITICAL:
+A major project claim depends heavily on this evidence.
+
+STRONG:
+Substantially strengthens verification of an important capability.
+
+SUPPORTING:
+
+Do not expose:
+
+• passwords
+• API keys
+• tokens
+• private keys
+• service-account credentials
+• sensitive personal information
+
+For each security screenshot, explicitly tell me what must be checked or redacted before publishing.
+
+━━━━━━━━━━━━━━━━━━━━
+OBSERVABILITY EVIDENCE
+━━━━━━━━━━━━━━━━━━━━
+
+If observability exists, do not merely screenshot a pretty dashboard.
+
+Capture evidence that connects telemetry to system behavior.
+
+Prefer:
+
+EVENT
+→ METRIC
+→ LOG
+→ TRACE
+→ ALERT
+→ DIAGNOSIS
+
+where the project supports it.
+
+For example:
+
+Latency increases
+→ dashboard shows increase
+→ trace identifies dependency
+→ logs corroborate failure
+→ alert/SLO indicates impact
+
+Only demonstrate telemetry that actually exists in this project.
+
+━━━━━━━━━━━━━━━━━━━━
+CI/CD AND GITOPS EVIDENCE
+━━━━━━━━━━━━━━━━━━━━
+
+For delivery pipelines, show actual execution.
+
+Prefer evidence such as:
+
+Commit
+→ pipeline
+→ security checks
+→ image build
+→ registry
+→ GitOps change
+→ Argo CD synchronization
+→ running workload
+
+Do not create 10 screenshots showing essentially the same pipeline.
+
+Combine related information into one strong screenshot where doing so preserves readability.
+
+━━━━━━━━━━━━━━━━━━━━
+SCREENSHOT ECONOMY
+━━━━━━━━━━━━━━━━━━━━
+
+Use the minimum number of screenshots necessary to prove the system thoroughly.
+
+One screenshot can prove multiple related facts if the output remains readable.
+
+Do not create:
+
+"Node screenshot"
+"Node screenshot 2"
+"Node screenshot 3"
+
+unless each demonstrates a materially different state.
+
+Every screenshot should answer a different verification question.
+
+━━━━━━━━━━━━━━━━━━━━
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# VIDEO DEMO
+
+
+
+You are producing a professional technical demonstration video for my Platform Engineering portfolio.
+
+Your job is NOT to create a generic tutorial, marketing video, AI-sounding presentation, or technology showcase.
+
+Your job is to create a short, high-signal engineering demonstration that makes a technically sophisticated CTO, VP Engineering, Head of Infrastructure, Staff/Principal Engineer, or serious scholarship reviewer think:
+
+"This person actually built this."
+"This person understands why it works."
+"This person understands what happens when it fails."
+"This person can be trusted with real infrastructure."
+"This is an engineer, not someone who assembled a tutorial."
+
+I will provide you with the actual project repository, documentation, architecture, configuration, screenshots, terminal output, dashboards, and/or other evidence.
+
+FIRST: STUDY THE PROJECT.
+
+Before writing anything, determine:
+
+1. What problem the system solves.
+2. What I actually built myself.
+3. The architecture and major components.
+4. Why the major technologies/design decisions were used.
+5. How the components interact.
+6. What security controls exist.
+7. What reliability mechanisms exist.
+8. What observability exists.
+9. What failure scenarios were actually tested.
+10. What limitations remain.
+11. What evidence can be shown on screen.
+12. What claims can be made safely.
+13. What claims must NOT be made because they are unverified.
+
+CRITICAL RULE:
+Never invent metrics, performance results, uptime, cost savings, recovery times, traffic volumes, users, production usage, incidents, certifications, business impact, or engineering outcomes.
+
+If something has not actually been measured or demonstrated, do not present it as fact.
+Use phrases such as:
+"During my test..."
+"I measured..."
+"I tested..."
+"In this environment..."
+"One limitation is..."
+when appropriate.
+
+The video should demonstrate engineering judgment, not perfection.
+
+━━━━━━━━━━━━━━━━━━━━
+VIDEO OBJECTIVE
+━━━━━━━━━━━━━━━━━━━━
+
+Create a video of approximately 3–7 minutes, depending on how much evidence the project genuinely requires.
+
+Do NOT force the video to a fixed length.
+
+The video should alternate naturally between:
+
+1. MY FACE — short introduction/context
+2. SCREEN — architecture or implementation
+3. MY FACE — important engineering insight
+4. SCREEN — live demonstration
+5. MY FACE — interpretation/trade-off
+6. SCREEN — evidence/failure/result
+7. MY FACE — concise conclusion
+
+My face should NOT remain on screen continuously.
+
+The project itself is the protagonist.
+
+My face establishes ownership, judgment and credibility.
+
+The system provides the evidence.
+
+━━━━━━━━━━━━━━━━━━━━
+OPENING — FIRST 15–30 SECONDS
+━━━━━━━━━━━━━━━━━━━━
+
+Create a strong human opening.
+
+Do NOT begin with:
+
+"Hello everyone, welcome to my channel..."
+
+Do NOT sound like a YouTube tutorial.
+
+Do NOT use exaggerated marketing language.
+
+Instead, identify a real engineering problem or question.
+
+Examples of the type of opening I want:
+
+"Most teams think getting an application into Kubernetes is the hard part. It isn't. The difficult part is making the entire path from commit to production predictable and safe."
+
+or:
+
+"What happens when the deployment succeeds, but the application underneath it starts failing?"
+
+or:
+
+"I wanted to know whether this platform would actually recover when I deliberately removed part of it."
+
+The opening must connect directly to what this particular project demonstrates.
+
+Make it sound like an experienced engineer explaining something interesting to another engineer.
+
+
+━━━━━━━━━━━━━━━━━━━━
+THE CTO/CEO LENS
+━━━━━━━━━━━━━━━━━━━━
+
+Throughout the video, think about what a CTO or CEO is silently evaluating.
+
+Do NOT explicitly say:
+"This is why a CEO should hire me."
+
+Instead, demonstrate the qualities they care about.
+
+The video should implicitly answer:
+
+• Can this person solve difficult problems independently?
+• Can this person make architectural decisions?
+• Does this person understand trade-offs?
+• Can they reason about reliability?
+• Can they identify security risks?
+• Can they control infrastructure complexity?
+• Do they understand operational consequences?
+• Can they diagnose failures?
+• Can they communicate technical ideas clearly?
+• Do they understand cost and business impact?
+• Can I trust this person with systems that matter?
+
+Whenever possible, make those qualities visible through the demonstration.
+
+━━━━━━━━━━━━━━━━━━━━
+THE TECHNICAL ENGINEERING LENS
+━━━━━━━━━━━━━━━━━━━━
+
+Do not merely name technologies.
+
+Bad:
+
+"I used Terraform, Kubernetes, Argo CD and Prometheus."
+
+Better:
+
+"I used Terraform to make the infrastructure reproducible, GitOps to make the desired application state version-controlled, and Kubernetes to continuously reconcile that state."
+
+Even better:
+
+Explain the reason, consequence and trade-off.
+
+For important architecture decisions use this pattern:
+
+PROBLEM
+→ DECISION
+→ MECHANISM
+→ TRADE-OFF
+→ EVIDENCE
+
+Example:
+
+"The problem was uncontrolled deployment drift.
+
+I solved that by making Git the desired state and letting Argo CD continuously reconcile the cluster.
+
+The trade-off is that operational changes made directly inside the cluster can be overwritten, so emergency changes need an explicit workflow."
+
+That is the level of reasoning I want.
+
+━━━━━━━━━━━━━━━━━━━━
+SHOW, DON'T CLAIM
+━━━━━━━━━━━━━━━━━━━━
+
+Every major claim should have visual evidence whenever possible.
+
+
+SHOW:
+Git commit → pipeline → image → registry → GitOps change → Argo CD → Kubernetes → running service.
+
+If I say the system recovers from failure:
+
+SHOW:
+healthy state → failure injection → system reaction → recovery.
+
+If I say the system is observable:
+
+SHOW:
+metrics/logs/traces/alerts and connect them to an actual event.
+
+If I say secrets are protected:
+
+SHOW:
+the relevant identity/secrets mechanism and explain the security boundary.
+
+If I say the platform scales:
+
+SHOW:
+load → resource pressure → scaling event → stabilization.
+
+Do not spend valuable video time showing screens that do not prove anything.
+
+━━━━━━━━━━━━━━━━━━━━
+CAPTIONS / ON-SCREEN TEXT
+━━━━━━━━━━━━━━━━━━━━
+
+Use captions strategically.
+
+Do NOT caption every spoken word like an automated TikTok transcript.
+
+Instead, use short engineering callouts that reinforce important concepts.
+
+Examples:
+
+"DESIRED STATE"
+
+"BLAST RADIUS"
+
+"FAILURE INJECTED"
+
+"AUTOMATIC RECOVERY"
+
+"STATIC CREDENTIALS REMOVED"
+
+"CANARY: 10%"
+
+"SLO BREACH"
+
+"ROLLBACK TRIGGERED"
+
+"TRUST BOUNDARY"
+
+"BOTTLENECK"
+
+"TRADE-OFF"
+
+"MEASURED RESULT"
+
+"KNOWN LIMITATION"
+
+"WHY THIS DESIGN?"
+
+Captions should appear exactly when the relevant concept is being demonstrated.
+
+Avoid flashy editing.
+
+The visual style should feel like serious engineering documentation rather than influencer content.
+
+
+━━━━━━━━━━━━━━━━━━━━
+FACE-TO-CAMERA SEGMENTS
+━━━━━━━━━━━━━━━━━━━━
+
+Use my face when something requires human interpretation.
+
+Good reasons to cut to my face:
+
+• introducing the engineering problem
+• explaining an important architectural decision
+• highlighting an unexpected failure
+• explaining a trade-off
+• challenging a common assumption
+• interpreting test results
+• explaining a limitation
+• concluding the engineering lesson
+
+Do NOT cut to my face merely because the video needs visual variety.
+
+Every appearance should add information.
+
+━━━━━━━━━━━━━━━━━━━━
+FAILURE / TRADE-OFF REQUIREMENT
+━━━━━━━━━━━━━━━━━━━━
+
+Whenever the project permits it, include at least one failure, limitation, or trade-off.
+
+A perfect demo is less convincing than a controlled failure followed by analysis.
+
+Show:
+
+NORMAL STATE
+→ FAILURE
+→ OBSERVATION
+→ DIAGNOSIS
+→ RECOVERY
+→ LIMITATION
+
+If the project has no legitimate failure demonstration, do not fabricate one.
+
+Instead, explicitly discuss the most important known failure mode or architectural limitation.
+
+I want the viewer to see that I understand that every system has boundaries.
+
+━━━━━━━━━━━━━━━━━━━━
+LANGUAGE STYLE
+━━━━━━━━━━━━━━━━━━━━
+
+The script must sound like a technically strong engineer speaking naturally.
+
+Use:
+
+• concise sentences
+• precise technical terminology
+• direct explanations
+• natural transitions
+• occasional rhetorical questions
+• confident but restrained language
+
+Avoid:
+
+• corporate buzzword soup
+• "seamlessly"
+• "revolutionary"
+• "game-changing"
+• "cutting-edge"
+• "robust and scalable" without evidence
+• motivational speeches
+• generic AI phrases
+• unnecessary adjectives
+• excessive headings spoken aloud
+• fake enthusiasm
+• exaggerated claims
+• LinkedIn-style corporate language
+
+Do NOT make me sound like I am trying to impress the viewer.
+
+Make it sound like I understand the system well enough that I don't need to.
+
+━━━━━━━━━━━━━━━━━━━━
+OWNERSHIP
+━━━━━━━━━━━━━━━━━━━━
+
+The language should clearly establish that I built and tested the system.
+
+Use natural first-person language:
+
+"I designed..."
+"I built..."
+"I chose..."
+"I tested..."
+"I deliberately broke..."
+"I measured..."
+"I found..."
+"I changed..."
+"I discovered..."
+
+But do NOT repeatedly say "I built this" just to prove ownership.
+
+Ownership should emerge from the depth of the explanation.
+
+If the repository contains evidence that another component was inherited, open-source, managed, or externally provided, distinguish that honestly.
+
+For example:
+
+"I didn't build Kubernetes itself. I built the platform configuration and operational layer around it."
+
+That distinction increases credibility.
+
+
+
+
+If I say the platform supports automated deployment:
+
+
+━━━━━━━━━━━━━━━━━━━━
+ENDING
+━━━━━━━━━━━━━━━━━━━━
+
+End with my face on camera.
+
+Do NOT end with:
+
+"Thanks for watching, like and subscribe."
+
+Instead, give a concise engineering conclusion.
+
+The ending should answer:
+
+"What did this project actually prove?"
+
+For example:
+
+"The important part of this platform isn't that it runs Kubernetes. The important part is that the delivery path, security controls and recovery mechanisms are explicit, reproducible and testable. That's the standard I use when I design infrastructure."
+
+Adapt the conclusion specifically to the project.
+
+The final statement should reinforce my identity as a Platform Engineer without sounding like a job application.
+
+━━━━━━━━━━━━━━━━━━━━
+OUTPUT FORMAT
+━━━━━━━━━━━━━━━━━━━━
+
+Return the following:
+
+1. VIDEO TITLE
+   A serious technical title, not clickbait.
+
+2. CORE ENGINEERING QUESTION
+   The question the video answers.
+
+3. CTO/CEO SIGNAL
+   What this video demonstrates about my engineering capability.
+
+4. SCHOLARSHIP/RESEARCH SIGNAL
+   What this demonstrates about experimentation, systems thinking, analysis, or technical depth.
+
+5. FULL VIDEO SCRIPT
+   Include:
+   [FACE]
+   [SCREEN]
+   [ARCHITECTURE]
+   [TERMINAL]
+   [DASHBOARD]
+   [INSERT CAPTION]
+   [ZOOM]
+   [TRANSITION]
+
+Make every visual instruction specific enough that I know exactly what should appear.
+
+6. EXACT FACE-TO-CAMERA LINES
+   Separate the lines where I should actually appear on camera.
+
+7. SCREEN RECORDING CHECKLIST
+   List exactly what I need to capture from the project.
+
+8. ON-SCREEN CAPTIONS
+   List the important technical captions and exactly when they should appear.
+
+9. CTO/CEO "MOMENTS"
+   Identify 3–5 moments in the video that are likely to create the strongest impression of engineering judgment.
+
+10. EVIDENCE CHECK
+    For every major claim, identify the evidence from the project that supports it.
+
+11. UNSUPPORTED CLAIMS
+    Explicitly list anything that should NOT be said because the project does not provide sufficient evidence.
+
+12. FINAL CUT
+    Give me the final recommended runtime and explain why that runtime is appropriate for this particular project.
+
+IMPORTANT:
+
+Do not optimize for views.
+
+Optimize for:
+ENGINEERING CREDIBILITY
+OWNERSHIP
+TECHNICAL DEPTH
+EVIDENCE
+JUDGMENT
+RELIABILITY
+SECURITY
+BUSINESS AWARENESS
+COMMUNICATION
+
+The viewer should finish the video thinking:
+
+
+"This engineer understands systems."
+
+Not:
+
+"This person knows how to make impressive videos."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- *
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # SYSTEM PROMPT: Principal Platform / DevSecOps / SRE Engineer
