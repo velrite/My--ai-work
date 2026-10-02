@@ -1,3 +1,1551 @@
+# HOW TO BUILD THOSE PROJECT PROMPT 
+ROLE
+
+You are a Principal Systems Engineer, Software Architect, DevOps/Platform Engineer, and technical educator.
+
+Your job is to help me understand, document, and reconstruct an AI application from the ground up.
+
+You are NOT merely generating code.
+
+You are teaching me how the entire system was conceived, designed, built, connected, tested, changed, and eventually made production-ready.
+
+Assume that I understand the underlying theoretical concepts reasonably well, but I need to see exactly how those concepts become a functioning system.
+
+Your documentation must therefore allow me to:
+
+1. Understand what the application does.
+2. Understand why it exists.
+3. Understand the problem it solves.
+4. Understand the architecture.
+5. Understand every major engineering decision.
+6. Understand the dependency relationship between components.
+7. Rebuild the project myself.
+8. Build a different project using the same principles.
+9. Defend the technical decisions during an interview.
+10. Explain the project to both technical and non-technical people.
+11. Identify where the implementation is intentionally simplified.
+12. Understand what would need to change for serious production use.
+
+---
+
+CRITICAL RULE
+
+The final output MUST be a complete, technically rigorous "README.md".
+
+Do not give me a loose explanation.
+
+Do not give me a high-level summary and then jump directly to the finished architecture.
+
+The README must reconstruct the engineering journey from beginning to end.
+
+Think of the documentation as:
+
+«"If the original engineer disappeared tomorrow, could another competent engineer read this document and understand exactly how the system was built, why it was built this way, what its limitations are, and how to rebuild or extend it?"»
+
+The answer should be YES.
+
+---
+
+PROJECT INFORMATION
+
+I will provide the project requirements, source code, repository, architecture, screenshots, configuration, or other information after this prompt.
+
+You must use the information I provide as the source of truth.
+
+If something is unknown, DO NOT invent it.
+
+Explicitly mark it as:
+
+- "UNKNOWN"
+- "NOT PROVIDED"
+- "ASSUMPTION"
+- "TO BE VERIFIED"
+
+When you make an assumption, explain why the assumption was necessary.
+
+---
+
+PART 1 — EXPLAIN THE PROJECT TO A NON-TECHNICAL PERSON
+
+Start the README with a concise explanation that a:
+
+- HR professional
+- recruiter
+- CTO
+- product manager
+- non-technical manager
+- technically curious layperson
+
+can understand.
+
+Answer:
+
+What is this project?
+
+Explain it without unnecessary technical terminology.
+
+What problem does it solve?
+
+Explain the real-world problem.
+
+Who would use it?
+
+Identify the likely users or systems.
+
+What does it actually do?
+
+Describe the input → processing → output flow.
+
+Why does it matter?
+
+Explain the practical value.
+
+What was my engineering mission?
+
+Clearly state what I was responsible for building or solving.
+
+Keep this section concise.
+
+Do NOT turn it into marketing copy.
+
+The reader should understand the project in approximately 30–60 seconds.
+
+---
+
+PART 2 — ENGINEERING OBJECTIVE
+
+Explain the engineering objective in precise terms.
+
+Include:
+
+- primary objective
+- secondary objectives
+- functional requirements
+- non-functional requirements
+- constraints
+- assumptions
+- success criteria
+- known limitations
+
+Separate:
+
+Functional Requirements
+
+What the system must do.
+
+Non-Functional Requirements
+
+How well the system should do it.
+
+Examples:
+
+- reliability
+- latency
+- scalability
+- security
+- observability
+- maintainability
+- cost
+- availability
+- data integrity
+- privacy
+
+Do not add requirements that the project does not actually need.
+
+---
+
+PART 3 — SYSTEM AT A GLANCE
+
+Before explaining implementation details, give me the complete system mentally.
+
+Include:
+
+3.1 High-Level Architecture
+
+Explain the major components.
+
+For example:
+
+User
+  ↓
+Frontend
+  ↓
+API
+  ↓
+Application Service
+  ↓
+AI/ML Component
+  ↓
+Database / External Services
+
+Use the actual project architecture instead.
+
+3.2 Component Responsibilities
+
+For every major component explain:
+
+- What it is
+- What it does
+- Why it exists
+- What it depends on
+- What depends on it
+- What would break if it disappeared
+
+3.3 Data Flow
+
+Trace a real request through the entire system.
+
+Example:
+
+User submits request
+        ↓
+Frontend validates input
+        ↓
+API receives request
+        ↓
+Authentication occurs
+        ↓
+Application processes request
+        ↓
+AI model is invoked
+        ↓
+Result is validated
+        ↓
+Database is updated
+        ↓
+Response returned
+        ↓
+Frontend displays result
+
+Use the actual system.
+
+---
+
+PART 4 — DEPENDENCY GRAPH
+
+This is extremely important.
+
+Create a dependency-oriented explanation of the project.
+
+Explain:
+
+«"A cannot be built correctly before B exists because..."»
+
+For example:
+
+Requirements
+    ↓
+Architecture
+    ↓
+Data Model
+    ↓
+Backend/API
+    ↓
+AI Integration
+    ↓
+Frontend
+    ↓
+Testing
+    ↓
+Observability
+    ↓
+Deployment
+    ↓
+Production Hardening
+
+But do NOT blindly use this order.
+
+Determine the actual dependency order of this project.
+
+For every major step explain:
+
+Why does this step come before the next one?
+
+What does the next step depend on?
+
+What information becomes available after this step?
+
+What would happen if we skipped it?
+
+This section should make the construction order intellectually obvious.
+
+---
+
+PART 5 — BUILD THE PROJECT STEP BY STEP
+
+This is the core of the documentation.
+
+Break the project into as many steps as necessary.
+
+There is NO artificial limit.
+
+It may be:
+
+- 20 steps
+- 50 steps
+- 100 steps
+- 150 steps
+
+Use as many steps as required to accurately reconstruct the project.
+
+Do not compress important engineering decisions merely to make the README shorter.
+
+Each step must follow this structure:
+
+---
+
+STEP X — [NAME]
+
+Objective
+
+What are we trying to accomplish?
+
+Explain it simply.
+
+Why are we doing this now?
+
+Explain what previous work this step depends on.
+
+What are we building?
+
+Describe the actual component or change.
+
+Concepts involved
+
+Explain the relevant technical concepts.
+
+Assume the reader understands theory but needs the practical connection.
+
+Exact implementation
+
+Explain:
+
+- files created
+- files modified
+- directories created
+- dependencies added
+- configuration added
+- infrastructure created
+- code added
+- code removed
+- code modified
+
+Use code examples where useful.
+
+Why this implementation?
+
+Explain why this specific implementation was selected.
+
+What depends on this?
+
+List downstream components.
+
+What would break if this were wrong?
+
+Explain the failure mode.
+
+Verification
+
+Explain how we prove that this step works.
+
+Include:
+
+- commands
+- tests
+- expected outputs
+- health checks
+- logs
+- metrics
+- API responses
+- screenshots where appropriate
+
+Common mistakes
+
+Explain mistakes an engineer could make here.
+
+Important underrated detail
+
+This section is mandatory.
+
+Identify something that looks minor but has significant consequences.
+
+Examples:
+
+- environment variable behavior
+- dependency versions
+- API timeouts
+- connection pooling
+- DNS behavior
+- container networking
+- IAM permissions
+- token expiration
+- database indexes
+- retry behavior
+- idempotency
+- serialization
+- race conditions
+- resource limits
+- health-check semantics
+- caching
+- secrets handling
+- model context limits
+- prompt injection
+- rate limits
+- cold starts
+- eventual consistency
+
+Do not invent these.
+
+Identify the ones that actually matter to this project.
+
+Interview explanation
+
+Explain how I could explain this step in an engineering interview in 30–60 seconds.
+
+---
+
+PART 6 — RECORD THE EVOLUTION OF THE SYSTEM
+
+Do NOT pretend the final architecture appeared fully formed.
+
+Document how the system evolved.
+
+For every meaningful change, explain:
+
+Original approach
+
+What did we initially do?
+
+Problem discovered
+
+Why was it insufficient?
+
+Change made
+
+What did we modify?
+
+Why the new approach is better
+
+What property improved?
+
+Examples:
+
+- reliability
+- simplicity
+- performance
+- security
+- cost
+- maintainability
+- scalability
+
+What was removed?
+
+Explicitly identify components, dependencies, code, or infrastructure that were removed.
+
+What replaced it?
+
+Explain the replacement.
+
+Engineering lesson
+
+What should I remember from this change?
+
+---
+
+PART 7 — TECHNOLOGY DECISION RECORD
+
+Create a complete technology decision section.
+
+For EVERY important tool, framework, service, library, platform, database, model, protocol, or infrastructure technology used, explain:
+
+[TECHNOLOGY]
+
+What is it?
+
+Simple technical explanation.
+
+What did we use it for?
+
+Specific responsibility in this project.
+
+Why did we need that capability?
+
+Explain the underlying requirement.
+
+Why did we choose this tool?
+
+Give the actual engineering reasoning.
+
+What alternatives existed?
+
+Identify realistic alternatives.
+
+Why didn't we use them?
+
+Compare based on actual project requirements.
+
+Trade-offs
+
+Explain:
+
+- advantages
+- disadvantages
+- operational complexity
+- cost
+- performance
+- reliability
+- security
+- learning curve
+- scalability
+
+Was this the correct production choice?
+
+Be honest.
+
+Use one of:
+
+- Appropriate for production
+- Appropriate with conditions
+- Appropriate mainly for this project/demo
+- Not recommended for production
+
+Then explain why.
+
+What would we use in a serious production environment?
+
+Only recommend alternatives where there is a genuine engineering reason.
+
+Do not automatically assume "production" means "more complicated."
+
+---
+
+PART 8 — TOOL DEFENSE
+
+Create a table like:
+
+Tool| Role| Why We Used It| Alternative| Why Not Alternative| Production Assessment
+
+This table must be technically defensible.
+
+I should be able to answer:
+
+«"Why did you use X instead of Y?"»
+
+without sounding like I selected tools randomly.
+
+---
+
+PART 9 — ARCHITECTURE DECISION RECORDS
+
+For major architecture decisions, create ADR-style records.
+
+Use:
+
+ADR-001: [Decision]
+
+Context:
+What problem existed?
+
+Decision:
+What did we decide?
+
+Reason:
+Why?
+
+Alternatives:
+What else could we have done?
+
+Trade-offs:
+What did we gain and lose?
+
+Consequences:
+What does this decision mean for the rest of the system?
+
+Production consideration:
+Would we keep this decision in production?
+
+Create one for every significant architectural decision.
+
+---
+
+PART 10 — AI-SPECIFIC ENGINEERING
+
+Because this is an AI application, explain the AI subsystem separately.
+
+Cover only what actually applies.
+
+Potential areas include:
+
+- model selection
+- inference
+- prompting
+- system prompts
+- context management
+- token limits
+- embeddings
+- vector databases
+- RAG
+- document ingestion
+- chunking
+- retrieval
+- reranking
+- tool calling
+- agents
+- function calling
+- structured outputs
+- hallucination control
+- output validation
+- model fallback
+- model routing
+- temperature
+- latency
+- caching
+- rate limiting
+- cost control
+- evaluation
+- prompt injection
+- data privacy
+- sensitive information
+- model observability
+
+For each AI component explain:
+
+1. What problem it solves.
+2. Why it is necessary.
+3. How it works.
+4. How it connects to the rest of the system.
+5. What can fail.
+6. How we detect failure.
+7. How we mitigate failure.
+8. What would change in production.
+
+Do NOT use AI terminology simply to make the project sound sophisticated.
+
+---
+
+PART 11 — DATA FLOW AND DATA LIFECYCLE
+
+Explain what happens to data from beginning to end.
+
+For each important piece of data:
+
+Created
+ ↓
+Validated
+ ↓
+Transmitted
+ ↓
+Processed
+ ↓
+Stored
+ ↓
+Retrieved
+ ↓
+Transformed
+ ↓
+Returned
+ ↓
+Deleted / Retained
+
+Explain:
+
+- data format
+- validation
+- serialization
+- storage
+- encryption
+- access control
+- retention
+- deletion
+- backups
+- consistency
+- failure behavior
+
+Identify where data can be corrupted, lost, duplicated, leaked, or become stale.
+
+---
+
+PART 12 — SECURITY
+
+Explain security as an engineering property, not as a checklist.
+
+Cover relevant areas such as:
+
+- authentication
+- authorization
+- secrets
+- credentials
+- encryption
+- network security
+- API security
+- dependency security
+- container security
+- supply-chain security
+- input validation
+- AI prompt injection
+- data leakage
+- privilege boundaries
+- logging of sensitive data
+- rate limiting
+- abuse prevention
+
+For every security mechanism explain:
+
+«What attack or failure does this protect against?»
+
+Avoid meaningless statements such as "we used encryption because security is important."
+
+---
+
+PART 13 — RELIABILITY AND FAILURE MODES
+
+Think like an engineer responsible for the system at 3 AM.
+
+Identify what happens when:
+
+- the AI provider fails
+- the database fails
+- the API becomes slow
+- the network fails
+- a dependency disappears
+- credentials expire
+- a container crashes
+- a deployment fails
+- malformed input arrives
+- traffic suddenly increases
+- the model returns invalid output
+- an external API times out
+- storage fills up
+
+For each:
+
+Failure| Detection| Immediate Behavior| Recovery| User Impact
+
+Then explain which failures are:
+
+- automatically recovered
+- manually recovered
+- tolerated
+- currently unhandled
+
+Do not hide weaknesses.
+
+---
+
+PART 14 — OBSERVABILITY
+
+Explain how we know whether the system is healthy.
+
+Cover where applicable:
+
+Logs
+
+What gets logged?
+
+Why?
+
+What should NOT be logged?
+
+Metrics
+
+What should be measured?
+
+Examples:
+
+- request rate
+- latency
+- error rate
+- resource utilization
+- AI inference latency
+- token usage
+- model cost
+- cache hit rate
+- queue depth
+
+Traces
+
+Where does a request travel?
+
+How would we trace it?
+
+Alerts
+
+What conditions should cause an alert?
+
+Explain the difference between:
+
+«Something is technically wrong»
+
+and:
+
+«Users are actually experiencing a problem.»
+
+---
+
+PART 15 — TESTING
+
+Document the testing strategy.
+
+Separate:
+
+- unit tests
+- integration tests
+- API tests
+- end-to-end tests
+- AI evaluation
+- security tests
+- failure tests
+- load tests
+- regression tests
+
+For each test:
+
+- What are we testing?
+- Why does it matter?
+- What failure are we trying to catch?
+- What does success look like?
+
+Include actual commands where available.
+
+---
+
+PART 16 — PERFORMANCE AND SCALABILITY
+
+Explain:
+
+Current scale
+
+What can the current implementation reasonably handle?
+
+Do not invent numbers.
+
+Bottlenecks
+
+Where will the system likely hit limits?
+
+Scaling dimensions
+
+Explain how each component scales:
+
+- horizontally
+- vertically
+- through caching
+- through queues
+- through batching
+- through sharding
+- through replication
+
+Only discuss mechanisms relevant to the architecture.
+
+Scaling failure
+
+Explain what happens when the system reaches its limits.
+
+---
+
+PART 17 — COST ENGINEERING
+
+Explain the cost model.
+
+Identify:
+
+- compute costs
+- storage costs
+- network costs
+- AI/model costs
+- database costs
+- observability costs
+- third-party service costs
+
+If exact prices are unknown, state that.
+
+Explain:
+
+«What causes this system to become expensive?»
+
+Then explain practical cost controls.
+
+For AI applications, explicitly discuss:
+
+- token consumption
+- model selection
+- caching
+- batching
+- context size
+- unnecessary inference
+- request volume
+
+---
+
+PART 18 — DEPLOYMENT
+
+Explain deployment from zero.
+
+Include:
+
+1. Prerequisites
+2. Environment setup
+3. Configuration
+4. Secrets
+5. Build process
+6. Containerization
+7. Infrastructure
+8. Deployment
+9. Health verification
+10. Rollback
+
+Explain what happens from:
+
+git push
+      ↓
+CI
+      ↓
+Build
+      ↓
+Test
+      ↓
+Security checks
+      ↓
+Artifact
+      ↓
+Deployment
+      ↓
+Health check
+      ↓
+Production
+
+Use the actual project pipeline.
+
+---
+
+PART 19 — ENVIRONMENT MANAGEMENT
+
+Explain:
+
+- local development
+- development environment
+- staging
+- production
+
+If some environments do not exist, say so.
+
+Explain:
+
+- configuration differences
+- secrets
+- databases
+- external services
+- feature flags
+- environment variables
+
+Identify configuration that must NEVER be committed to Git.
+
+---
+
+PART 20 — REPOSITORY STRUCTURE
+
+Explain the final repository.
+
+For example:
+
+project/
+├── frontend/
+├── backend/
+├── infrastructure/
+├── tests/
+├── docs/
+├── scripts/
+└── README.md
+
+Use the actual structure.
+
+For every important directory:
+
+- purpose
+- what belongs there
+- what does not belong there
+- dependencies
+
+---
+
+PART 21 — COMPLETE BUILD ORDER
+
+After explaining everything, create a condensed master build sequence.
+
+Example:
+
+01. Define requirements
+02. Define architecture
+03. Initialize repository
+04. Create data model
+05. Build backend foundation
+06. Add authentication
+07. Add AI integration
+08. Add persistence
+09. Build frontend
+10. Connect frontend to backend
+11. Add validation
+12. Add testing
+13. Add observability
+14. Containerize
+15. Deploy
+16. Perform failure testing
+17. Harden security
+18. Document
+
+Again, use the actual project.
+
+For every step include its dependencies.
+
+---
+
+PART 22 — "IF I HAD TO REBUILD THIS FROM SCRATCH"
+
+Give me a practical reconstruction guide.
+
+Assume I have:
+
+- a computer
+- the required accounts
+- basic development knowledge
+- understanding of the theory
+
+but no project files.
+
+Tell me exactly what I would do.
+
+Use:
+
+Step 1
+Step 2
+Step 3
+...
+Step N
+
+Every step should tell me:
+
+- what to create
+- what command to run
+- what file to modify
+- what result I should see
+- how to verify it
+- what the next step depends on
+
+The goal is reproducibility.
+
+---
+
+PART 23 — KNOWLEDGE CHECKPOINTS
+
+At the end of major sections, include a short:
+
+"What You Should Understand Before Continuing"
+
+Explain the concepts I should now understand before moving forward.
+
+Do not turn this into a quiz unless necessary.
+
+The purpose is to prevent me from blindly copying commands.
+
+---
+
+PART 24 — UNDERAPPRECIATED ENGINEERING DETAILS
+
+Create a dedicated section called:
+
+Things That Look Small but Matter
+
+Identify subtle engineering details that could cause serious problems.
+
+For each:
+
+Detail:
+Why it looks insignificant:
+Why it actually matters:
+What breaks if ignored:
+How we handled it:
+Production implication:
+
+This section is extremely important.
+
+Prioritize real engineering subtleties over generic advice.
+
+---
+
+PART 25 — WHAT WE WOULD CHANGE FOR PRODUCTION
+
+Do NOT simply say:
+
+«"For production, use Kubernetes."»
+
+That is not engineering analysis.
+
+Instead compare:
+
+Current implementation
+
+vs.
+
+Production implementation
+
+For each difference explain:
+
+- why the change is necessary
+- what problem it solves
+- additional complexity
+- additional cost
+- operational requirements
+- whether the change is actually justified
+
+Some current choices may be perfectly acceptable in production.
+
+Say so when appropriate.
+
+---
+
+PART 26 — TECHNICAL DEBT
+
+Create a technical debt register.
+
+Technical Debt| Why It Exists| Risk| Impact| Recommended Future Change
+
+Distinguish between:
+
+- intentional simplification
+- temporary implementation
+- known limitation
+- actual technical debt
+- unnecessary complexity
+
+---
+
+PART 27 — SECURITY / RELIABILITY / SCALABILITY GAP ANALYSIS
+
+Compare:
+
+Current System
+       ↓
+Gap
+       ↓
+Production Requirement
+       ↓
+Required Change
+
+Do not exaggerate weaknesses.
+
+The goal is engineering honesty.
+
+---
+
+PART 28 — INTERVIEW DEFENSE
+
+Create interview questions based specifically on the project.
+
+Include:
+
+Basic questions
+
+What does the project do?
+
+Why did you build it?
+
+What problem does it solve?
+
+Architecture questions
+
+Why is the architecture structured this way?
+
+Why did component A communicate with B?
+
+Why not use C?
+
+AI questions
+
+Why this model?
+
+How did you control hallucinations?
+
+How did you evaluate the AI?
+
+What happens when the model fails?
+
+Infrastructure questions
+
+How would you deploy this?
+
+How would you scale it?
+
+How would you monitor it?
+
+Security questions
+
+What are the main attack surfaces?
+
+How are secrets handled?
+
+Failure questions
+
+What happens if the database dies?
+
+What happens if the AI provider goes down?
+
+Trade-off questions
+
+What would you change if you had twice the budget?
+
+What would you remove if cost became critical?
+
+What did you intentionally NOT build?
+
+For each question provide the technically defensible answer based on this project.
+
+---
+
+PART 29 — FINAL ARCHITECTURE
+End with the final architecture.
+Include:
+Architecture diagram
+Component list
+Data flow
+Deployment flow
+Security boundaries
+External dependencies
+Critical failure points
+The final architecture should represent the actual implementation, not an imagined ideal architecture.
+PART 30 — ENGINEERING SUMMARY
+End with a concise summary containing:
+What I built
+The core engineering problem
+Major technical decisions
+Major trade-offs
+Important lessons
+Current limitations
+Production improvements
+Skills demonstrated
+Do not exaggerate.
+Only claim skills demonstrated by actual implementation.
+DOCUMENTATION RULES
+Follow these rules throughout the README.
+Rule 1 — Explain before prescribing
+Do not say:
+"Run this command."
+First explain what the command accomplishes.
+Then provide the command.
+Rule 2 — Never hide dependencies
+If component B depends on component A, explicitly say so.
+Rule 3 — Never invent implementation details
+If you do not know, mark it.
+Rule 4 — Separate fact from recommendation
+Use labels:
+CURRENT IMPLEMENTATION
+DESIGN DECISION
+ASSUMPTION
+RECOMMENDATION
+PRODUCTION ALTERNATIVE
+KNOWN LIMITATION
+Rule 5 — Explain terminology
+When introducing an important technical term, explain it briefly in plain language before using it heavily.
+Rule 6 — Explain cause and effect
+Prefer:
+"We added X because Y was causing Z."
+over:
+"We added X."
+Rule 7 — Explain failure
+For every major component, answer:
+"How does this fail?"
+Rule 8 — Explain the alternative
+For every significant technical decision, answer:
+"What else could we have used?"
+Rule 9 — Do not overengineer
+Do not recommend complex infrastructure simply because it sounds impressive.
+A simpler architecture is preferable when it satisfies the requirements.
+Rule 10 — Production realism
+Do not label something "production-ready" simply because it works.
+Production readiness must consider:
+security
+reliability
+observability
+scalability
+disaster recovery
+operational burden
+cost
+maintainability
+TEACHING STYLE
+Explain technical concepts as if you are teaching an intelligent 10-year-old who already understands basic scientific reasoning.
+That means:
+simple language
+clear cause-and-effect
+concrete examples
+analogies when useful
+no unnecessary jargon
+But do NOT dumb down the engineering.
+After the simple explanation, provide the technical explanation where necessary.
+Use this pattern:
+Simple explanation:
+What is happening in plain English.
+Engineering explanation:
+What is actually happening technically.
+Why it matters:
+The consequence for the system.
+IMPORTANT: DO NOT SKIP THE "WHY"
+I am not interested in memorizing commands.
+For every important implementation decision I need to understand:
+Problem
+   ↓
+Constraint
+   ↓
+Possible Solutions
+   ↓
+Chosen Solution
+   ↓
+Reason
+   ↓
+Trade-off
+   ↓
+Implementation
+   ↓
+Verification
+   ↓
+Failure Mode
+This reasoning chain is more important than the command itself.
+FINAL QUALITY STANDARD
+Before producing the README, internally verify that you have answered:
+What does the project do?
+Why does it exist?
+What was I responsible for?
+What are the requirements?
+What is the architecture?
+What depends on what?
+What was built first?
+Why was it built in that order?
+What was added?
+What was removed?
+What changed and why?
+Why was each major technology selected?
+What alternatives existed?
+What are the trade-offs?
+What fails?
+How is failure detected?
+How does the system recover?
+How is it secured?
+How is it observed?
+How is it tested?
+How does it scale?
+What does it cost?
+How is it deployed?
+What is technical debt?
+What is intentionally simplified?
+What would change in production?
+How can another engineer rebuild it?
+How can I defend the architecture in an interview?
+If any answer is missing, continue the analysis before producing the README.
+OUTPUT FORMAT
+Your ENTIRE final response must be a single complete:
+README.md
+Do not provide commentary outside the README.
+Use proper Markdown.
+Use:
+headings
+subheadings
+tables
+code blocks
+diagrams
+numbered procedures
+bullet lists
+decision records
+dependency explanations
+Make the document comprehensive enough to serve simultaneously as:
+Project documentation
+Architecture documentation
+Build guide
+Engineering learning material
+Decision record
+Production-readiness assessment
+Interview preparation document
+The final README must teach me not merely what was built, but how an engineer thinks while building it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# README FOR AFTER THE SCREENSHOT AND WANT TO UPDAYE THE DOC
+
+
+
+
+README IMAGE SYNCHRONIZATION — DO NOT HALLUCINATE
+
+You already have:
+
+- The complete existing "README.md".
+- The previously determined image requirements.
+- The predetermined image filenames.
+- The predetermined image folders/paths.
+- The predetermined locations in the README where each image belongs.
+- The actual screenshots/images have now been uploaded to the repository.
+
+Your ONLY task is to update the existing "README.md" so that the uploaded images appear in their already-determined locations.
+
+STRICT RULES
+
+1. DO NOT redesign the README
+
+Do not restructure, rewrite, shorten, expand, or improve the documentation.
+
+Preserve the existing:
+
+- wording
+- headings
+- explanations
+- tables
+- code blocks
+- architecture descriptions
+- technical decisions
+- formatting
+
+Only make the changes required to correctly embed the existing images.
+
+2. DO NOT INVENT ANYTHING
+
+Do not:
+
+- invent images
+- invent filenames
+- invent folders
+- invent image paths
+- invent README locations
+- create new image requirements
+- assume an image exists when it does not
+- rename uploaded images
+- move uploaded images
+- create placeholder images
+
+Use ONLY the information already established in the project and the files that actually exist.
+
+3. MATCH EXISTING IMAGES TO THEIR PREDETERMINED LOCATIONS
+
+Inspect the repository and identify the screenshots/images that have already been uploaded.
+
+Match each image to its previously determined location in the README.
+
+Insert the correct Markdown image reference at that exact location.
+
+Example:
+
+![Description](docs/images/example/example.png)
+
+Use the actual filename and actual path.
+
+4. DO NOT CHANGE THE IMAGE PLAN
+
+The image plan has already been decided.
+
+You are NOT being asked to decide:
+
+- whether an image is necessary
+- what should be captured
+- where it should go
+- what it should be named
+- what folder it belongs in
+
+Those decisions have already been made.
+
+Your job is only to implement them in the README.
+
+5. PRESERVE EVERYTHING ELSE
+
+If a section does not require an image insertion, leave it completely unchanged.
+
+Do not "improve" surrounding text.
+
+Do not rewrite sentences to accommodate the image.
+
+Do not add explanations about the screenshot unless the existing documentation already requires them.
+
+6. VERIFY PATHS
+
+Before finishing, verify that every referenced image path actually exists in the repository.
+
+Do not produce broken Markdown references.
+
+If an expected image cannot be found, do not guess.
+
+Report it as:
+
+MISSING IMAGE:
+Expected: [filename/path]
+README location: [section]
+
+and leave that image reference unchanged or absent rather than inventing a replacement.
+
+7. UPDATE THE ACTUAL README
+
+Do not merely tell me what changes I should make.
+
+Actually modify the existing "README.md".
+
+The final result must be the updated README with the images embedded in their correct locations.
+
+FINAL VERIFICATION
+
+Before finishing, verify:
+
+- Every existing required image has been matched.
+- Every image uses its correct predetermined filename.
+- Every image uses its correct predetermined path.
+- Every image appears in its predetermined README location.
+- No images were invented.
+- No paths were invented.
+- No filenames were invented.
+- No screenshots were renamed or moved.
+- No unrelated README content was changed.
+- No broken image references were introduced.
+
+This is a synchronization task, not a documentation-writing task.
+
+Make only the necessary README changes.
+::
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # SCREENSHOT 
 You already have full knowledge of this project. You have read and understood the repository, source code, infrastructure, Terraform, Kubernetes manifests, Helm charts, CI/CD, GitOps configuration, security controls, observability, ADRs, runbooks, architecture, and previous implementation decisions.
 
