@@ -1,290 +1,1474 @@
-# Enterprise Cloud Platform — Velrite
-
-**Repository:** `velrite/enterprise-cloud-platform`
-**Application deployed onto it:** `velrite/bank-of-anthos` (fork)
-
-One repository. One continuous build, done from scratch, alone — not a series of separate projects inheriting across repo boundaries. Everything below is a **phase** of the same 43-step roadmap, in the same codebase, on the same cluster. Nothing here was rebuilt or reprovisioned between phases — each phase just adds to what the previous one left running.
-
-> Note: an earlier draft of this roadmap included a "Phase: Internal Developer Platform (Self-Service + Custom CLI)." It was deliberately cut — lowest signal-to-effort ratio in the plan, and it would have created fragile dependencies for later phases. Everything below reflects that decision.
-
----
-
-## Roadmap at a Glance
-
-| Phase | Name | Status | Steps |
-|---|---|---|---|
-| 1 | Kubernetes Platform Foundation | ✅ Complete | Cluster, networking, node groups, base RBAC |
-| 2 | Enterprise Cloud Platform | ✅ Complete | CI/CD Supply Chain, Security & Observability  |
-| 3 | Enterprise Cloud Platform | ✅ Complete | Resilience, Chaos Engineering & Disaster Recovery  |
-| 5 | Enterprise Cloud Platform | ✅ Complete | FinOps & Cloud Cost Intelligence |
-| Bonus B | Large System Design Document | ⏳ Ongoing, low effort | — |
-
-**Environment:** AWS account 681117450689, us-east-1, Free Plan, t3.small-only, WSL2 on Windows. Cluster is torn down between sessions (cluster → network, never Terraform bootstrap) — every session starts with a rebuild.
-
-**Current blocker (Step 33):** Loki + Tempo + OpenTelemetry Collector install blocked — GitHub Pages CDN IP range (185.199.108.0/22) refuses connections specifically; DNS is fine, other Helm repos and general internet work. Untested fallback: pull the chart via jsdelivr's GitHub mirror instead of raw GitHub Pages, then `helm install` from a local `.tgz`.
-
----
-
-## PHASE 1: Kubernetes Platform Foundation
-
-**What this phase built:** The EKS cluster, VPC/networking, node groups, base RBAC, and Terraform module structure that every later phase runs on top of. Built alone, from scratch — no prior repo, no external starting point.
-
-**Persona:** You are a senior Platform Engineer with deep production experience standing up Kubernetes clusters the right way the first time — not someone clicking through a console. You are mentoring me, your intern, to understand foundational infrastructure decisions, not just execute commands.
-
-**Teaching style (non-negotiable):**
-- Explain like I'm a smart 10-year-old, plain language, no assumed knowledge.
-- Small, single confirmable steps, one at a time.
-- Call out "Mistakes ordinary engineers make here" vs. "What a pro does instead" — especially around skipping remote state, hardcoding values, or provisioning without a teardown plan.
-- Explain the why behind every Terraform module and Kubernetes primitive, not just the how.
-
-**Question this phase must answer:** Can this engineer provision real, production-shaped Kubernetes infrastructure as code — reproducibly, not by hand?
-
-### 1.1 Why This Phase — The Leverage
-This is the load-bearing foundation for the entire repository. Every later phase depends on what gets built here. Getting this right — remote state, modular Terraform, a real node group, real RBAC — is what makes every later phase's "already running" claim actually true.
-
-### 1.2 Build
-**Terraform Foundation**
-- Remote state backend (S3 + DynamoDB lock table), never local state
-- VPC, subnets (public/private), NAT gateway, route tables
-- EKS cluster, managed node group(s), cluster autoscaler
-- Base IAM roles, IRSA (IAM Roles for Service Accounts) wiring
-
-**Kubernetes Baseline**
-- Namespaces convention (platform, apps, monitoring, security — extended by later phases)
-- Base RBAC: least-privilege roles, no default cluster-admin usage
-- NetworkPolicy default posture decided and documented
-
-### 1.3 Show Explicitly
-- `terraform plan` / `apply` from a clean state, end to end
-- A node draining and recovering (node recovery test)
-- `kubectl auth can-i` checks proving RBAC is actually least-privilege, not just configured
-
-### 1.4 Required Deliverables (every one, no skipping)
-1. Executive summary
-2. Business problem
-3. Requirements
-4. Architecture diagram (cluster, networking, node groups)
-5. Design decisions and trade-offs (managed node groups vs. Fargate, remote state design)
-6. Infrastructure as Code for this layer
-7. CI/CD for Terraform changes (plan on PR, apply on merge — minimal, extended in Phase 2)
-8. Security architecture (IAM, IRSA, base RBAC, NetworkPolicy posture)
-9. Monitoring baseline (what exists before Phase 2's full observability stack)
-10. Failure testing — node recovery, kubectl rollback
-11. Load testing — basic HPA scaling test (documented: 2→8 pods, CPU peak, recovery time)
-12. Cost analysis — baseline monthly cost of this layer alone
-13. Runbook — cluster bootstrap and teardown procedure
-14. Incident postmortem — a real issue hit and fixed during this build
-15. README with setup instructions (this repo's foundation section)
-16. Demo video script (5–10 minutes) — full narration/shot list
-
-### 1.5 Operational Maturity — Answer Explicitly
-1.5.1 What is the blast radius if the node group is scaled to zero by mistake?
-1.5.2 What happens to running workloads during a node group upgrade?
-1.5.3 How is Terraform state protected from concurrent modification?
-1.5.4 What is the teardown procedure, and does it leave anything orphaned (EBS volumes, load balancers)?
-
-### 1.6 Success Criteria
-A reviewer should be able to run `terraform apply` against this repo from scratch and get a working, secured cluster — with every later phase's infrastructure able to layer on top of it without modification to this base.
-
----
-## PHASE 2: CI/CD Supply Chain, Security & Observability
-
-
-**What this phase adds:** The full CI/CD supply chain (build, scan, sign, deploy), security controls (Kyverno, Falco, Vault), and the complete observability stack (Prometheus, Grafana, Loki, Tempo, OpenTelemetry, Alertmanager) — all deployed onto Phase 1's existing cluster, in the same repository, no new infrastructure re-provisioned.
-
-**Persona:** You are a senior DevSecOps engineer with real production experience building secure software supply chains — not someone who bolts on a scanner and calls it done. You are mentoring me, your intern, to understand why each security gate exists and what specific risk it closes.
-
-**Teaching style (non-negotiable):**
-- Explain like I'm a smart 10-year-old, plain language, no assumed knowledge.
-- Small, single confirmable steps, one at a time.
-- Call out "Mistakes ordinary engineers make here" vs. "What a pro does instead" — especially around security theater (scanners installed but not gating anything).
-- Explain the why behind every security gate and every dashboard panel — not just that it exists.
-
-**Question this phase must answer:** Can this engineer build a real secure software supply chain and prove security posture changed — not just install tools?
-
-### 2.1 Why This Phase — The Leverage
-This is the highest-signal phase in the repository. Supply chain security and real observability (not vanity dashboards) are what separates a working platform engineer from someone who deployed a demo. Every later phase reuses this layer's gates and dashboards rather than building new ones — so this has to be solid.
-
-### 2.2 Build
-**CI/CD Supply Chain**
-- Build → scan → sign → gate → deploy pipeline
-- Trivy (container + dependency scanning), Syft (SBOM), Cosign (image signing)
-- Admission-enforced signature verification (unsigned images rejected at the cluster)
-
-**Security Architecture**
-- Kyverno policy enforcement, Falco runtime threat detection
-- Vault for secrets management, short-lived credentials
-- CIS Kubernetes benchmark, kube-bench — run before and after hardening
-
-**Observability Stack**
-- Prometheus, Grafana, Loki, Tempo, OpenTelemetry, Alertmanager
-- Dashboards built around Golden Signals / RED / USE metrics
-- SLOs and error budgets explicitly defined, not just graphs that exist
-
-### 2.3 Show Explicitly
-- The full secure software supply chain, end to end, with a diagram
-- Every security gate and exactly what it blocks
-- A live rollback demonstration: something fails → pipeline catches it → automatic rollback happens
-- Before-vs-after CIS benchmark results with specific risks closed
-
-### 2.4 Required Deliverables (every one, no skipping)
-1. Executive summary
-2. Business problem
-3. Requirements
-4. Architecture diagram (showing this layer on top of Phase 1's cluster)
-5. Design decisions and trade-offs
-6. Infrastructure as Code for this layer only
-7. CI/CD pipeline (core deliverable — go deep)
-8. Security architecture (core deliverable — before/after required)
-9. Monitoring dashboards (core deliverable — describe every panel and why it exists)
-10. Failure testing — a bad image gets pushed, what stops it; a fault gets injected, what happens
-11. Load testing — mesh overhead / sidecar latency cost
-12. Cost analysis — extra compute cost of sidecars and scanning, on top of Phase 1's baseline cost
-13. Runbook — responding to a Falco alert or failed compliance check
-14. Incident postmortem — simulate an unsigned/vulnerable image almost reaching production
-15. README with setup instructions (assumes Phase 1 is already running)
-16. Demo video script (5–10 minutes) — full narration/shot list
-
-### 2.5 Operational Maturity — Answer Explicitly
-2.5.1 What is the blast radius if one control (e.g. Kyverno) is disabled by mistake?
-2.5.2 What specific attack does each security control prevent?
-2.5.3 What are the SLOs for the pipeline itself — build time, deploy time, rollback time?
-2.5.4 How do retries interact badly with circuit breakers if misconfigured (retry storms)?
-2.5.5 How is access to the pipeline and mesh config itself controlled and audited?
-
-### 2.6 Success Criteria
-A reviewer should be able to trace one commit through the entire pipeline — scan, sign, gate, deploy, observe — and see a real before/after security posture change on the cluster, not just a diagram claiming one.
-
----
-
-## PHASE 3: Resilience, Chaos Engineering & Disaster Recovery
-
-**What this phase adds:** Chaos experiments, HA database failover, backup & restore — all against the already-running cluster and workloads from Phases 1–2. No new cluster, no new repo.
-
-**Persona:** You are a senior Platform/SRE engineer who has broken and recovered real production systems more times than you can count. You are mentoring me, your intern, to build the instincts of someone who tests failure on purpose instead of hoping it never happens.
-
-**Teaching style (non-negotiable):**
-- Explain like I'm a smart 10-year-old.
-- Small, single confirmable steps.
-- Call out "Mistakes ordinary engineers make here" vs. "What a pro does instead" — especially never testing backups/restores until it's too late.
-- Always state the hypothesis before running an experiment: what do we expect to happen, and why.
-
-**Question this phase must answer:** What actually happens when production breaks, and how fast does it come back?
-
-### 3.1 Why This Phase — The Leverage
-Automated failover is a named hiring signal. This phase is where that claim gets proven under real, injected failure against the actual platform built in Phases 1–2 — not just described in a diagram. It merges what could have been three separate builds (Chaos Engineering Lab, Disaster Recovery, HA Database) because in practice they're one story: break it on purpose, then prove it comes back, with real numbers attached.
-
-### 3.2 Build
-**Chaos Experiments**
-Using Chaos Mesh or LitmusChaos: kill nodes, kill pods, break networking, fill disks, expire certificates, simulate region failure. State the hypothesis before every run.
-
-**HA Database Failover**
-PostgreSQL cluster with replication and automated failover (Patroni or equivalent), Redis Sentinel, etcd cluster. Kill the primary live and show the promotion happen.
-
-**Backup & Restore**
-Velero: full cluster restore, namespace-level restore, persistent volume restore, database restore.
-
-### 3.3 Show Explicitly
-- Each of the six chaos experiments, with hypothesis stated first and outcome documented after
-- A full cluster restore from scratch, timed
-- A live database failover with the promotion happening on camera
-- What self-healed automatically vs. what needed a human
-
-### 3.4 Required Deliverables (every one, no skipping)
-1. Executive summary
-2. Business problem
-3. Requirements
-4. Architecture diagram
-5. Design decisions and trade-offs
-6. Infrastructure as Code (the DB/backup layer only)
-7. CI/CD — automated, scheduled backups; chaos experiments gating the pipeline where relevant
-8. Security architecture — backup encryption, restore access control
-9. Monitoring dashboards — backup success/failure, availability during chaos (extending Phase 2's Grafana)
-10. Failure testing — the six chaos experiments, in full detail; this is the core deliverable
-11. Load testing — system behavior under chaos and load combined
-12. Cost analysis — storage cost of backups, cost of downtime
-13. Runbook — step-by-step restore procedure
-14. Incident postmortem — simulate "we lost the cluster," full recovery walkthrough
-15. README with setup instructions
-16. Demo video script (5–10 minutes) — include a live failover in the recording
-
-### 3.5 Operational Maturity — Answer Explicitly
-3.5.1 What is the actual measured RTO and RPO, not the target?
-3.5.2 What is the blast radius of a split-brain event?
-3.5.3 What self-healed automatically vs. what required a human to step in?
-3.5.4 How often should restores actually be tested, and how is that scheduled?
-
-### 3.6 Success Criteria
-A reviewer should be able to see a database primary killed on camera and a working replica promoted, with a real measured number attached to how long it took — not a claim that failover "is configured."
-
----
-
-
-## PHASE 4: FinOps & Cloud Cost Intelligence Platform
-
-**What this phase adds:** Cost visibility, waste detection, forecasting & alerting — nothing else. Zero new infrastructure; it instruments and analyzes what already exists from Phases 1–4.
-
-**Persona:** You are a senior Platform engineer who treats cloud spend as seriously as uptime. You are mentoring me, your intern, to think about money the way senior engineers do — most engineers ignore this, and that's exactly why it's a differentiator.
-
-**Teaching style (non-negotiable):**
-- Explain like I'm a smart 10-year-old.
-- Small, single confirmable steps.
-- Call out "Mistakes ordinary engineers make here" vs. "What a pro does instead" — especially around ignoring idle resources and over-provisioning "just in case."
-- Explain the why behind every cost-saving recommendation, tied to real trade-offs — cost vs. reliability vs. performance.
-
-**Question this phase must answer:** Can this engineer control cloud spend, not just infrastructure?
-
-### 4.1 Why This Phase — The Leverage
-Most engineers skip cost ownership entirely — that's exactly why it stands out when someone doesn't. It's also the fastest phase in this repository to build well, because it reuses every cluster and cost tag already set up across Phases 1–4 instead of standing up anything new.
-
-### 4.2 Build
-**Cost Visibility**
-OpenCost, Kubecost — cost per namespace, per team, per service, per deployment.
-
-**Waste Detection**
-Idle/unused resource detection, orphaned load balancer detection, rightsizing recommendations, spot utilization.
-
-**Forecasting & Alerting**
-Monthly cost forecasting, cost anomaly detection, savings recommendations with real dollar estimates.
-
-### 4.3 Show Explicitly
-- A direct cost comparison between two workload types already running in the repository (e.g. a standard web workload and the AI inference workload from Phase 4) — real data, not estimates
-- At least one concrete savings recommendation with a real dollar figure attached
-- A simulated cost spike, detected and alerted on
-
-### 4.4 Required Deliverables (every one, no skipping)
-1. Executive summary
-2. Business problem
-3. Requirements
-4. Architecture diagram
-5. Design decisions and trade-offs
-6. Infrastructure as Code (cost tooling only, no new cluster/app infra)
-7. CI/CD — cost checks flagging expensive changes before merge
-8. Security architecture — access to billing/cost data
-9. Monitoring dashboards — cost dashboards, the core deliverable
-10. Failure testing — simulate a runaway resource/cost spike
-11. Load testing — cost vs. performance trade-off testing
-12. Cost analysis — the core of the entire phase, go deep
-13. Runbook — what to do when a cost spike alert fires
-14. Incident postmortem — simulate an unexpected billing spike
-15. README with setup instructions
-16. Demo video script (5–10 minutes) — full narration/shot list
-
-### 4.5 Operational Maturity — Answer Explicitly
-4.5.1 What is the dollar blast radius of an unnoticed idle resource over a month?
-4.5.2 How fast can a cost spike be detected vs. a downtime incident?
-4.5.3 Who is accountable for cost per team/namespace?
-
-### 4.6 Success Criteria
-A reviewer should be able to see a specific savings recommendation with a real dollar figure attached, sourced from actual usage data across Phases 1–4, not a generic "right-size your pods" statement.
-
----
-
-
-
-
-
-
+# Observability + Chaos Engineering 🔭💥
+## Your Senior DevSecOps Mentor Speaking
+You've built the platform. You've secured it. You've automated it. You've optimized it.
+Now comes the most important skill of all — knowing when it's broken before your users do, and proving you can fix it fast.
+Every company claims their system is reliable. The ones who actually know are the ones who measure it obsessively, break it on purpose to practice recovery, and document every failure so it never happens twice.
+This module turns you from someone who hopes the system works into someone who proves the system works. That proof is called observability. The practice of improving it is called chaos engineering.
+Combined they answer the hardest question in production: "How confident are you that your system will be up next Tuesday at 2pm?"
+After this module, you will have an answer with numbers.
+THE MASTER MENTAL MODEL FIRST
+THE THREE PILLARS OF OBSERVABILITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+METRICS = Numbers over time
+"My API served 10,000 requests in the last minute"
+"CPU is at 67%"
+"P99 latency is 340ms"
+→ Tell you WHAT is happening
+→ Tool: Prometheus + Grafana
+
+LOGS = Events with context
+"2024-01-01 12:00:01 ERROR: database connection failed: timeout"
+→ Tell you WHAT HAPPENED at a specific moment
+→ Tool: Loki + Grafana, or CloudWatch Logs
+
+TRACES = Request journeys
+"This request went: API → Auth Service → DB → Cache → Response"
+"It took 340ms. The DB call took 310ms. That's the bottleneck."
+→ Tell you WHERE the problem is in a distributed system
+→ Tool: Jaeger, Tempo + Grafana
+
+THE RELATIONSHIP:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Alert fires → You look at METRICS (what's broken?)
+Metrics show API errors spiking → You look at LOGS (why?)
+Logs show DB timeouts → You look at TRACES (which call?)
+Traces show one slow query → You fix the query
+
+Without observability:
+User: "Your site is down"
+You: "Uh... let me check things..."
+[30 minutes of blind searching]
+
+With observability:
+Alert fires: "Error rate > 1% for 5 minutes"
+You open Grafana: error rate spiked at 14:32
+You check logs: DB connection pool exhausted
+You check traces: /api/users endpoint, query taking 45s
+You fix: bad query + add index
+Time to fix: 8 minutes
+
+THE GOLDEN SIGNALS — The Four Numbers That Matter
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Google SRE invented this. Every production system needs exactly
+four measurements. If you only measure four things, measure these.
+
+1. LATENCY    → How long do requests take?
+   "Good requests should complete in < 200ms"
+   Measure: P50, P95, P99 (not average — average lies)
+
+2. TRAFFIC    → How many requests per second?
+   "We serve 10,000 RPS at peak"
+   Measure: requests/second by endpoint and status
+
+3. ERRORS     → What fraction of requests fail?
+   "Less than 0.1% of requests return 5xx"
+   Measure: error rate = errors / total requests
+
+4. SATURATION → How full is your system?
+   "CPU at 80% = getting close to limit"
+   Measure: CPU%, memory%, queue depth, connection pool
+
+WHY THESE FOUR:
+If latency is high → users are frustrated
+If traffic is zero → something is broken upstream
+If errors are high → users are getting failures
+If saturation is high → system about to fall over
+PART 1: PROMETHEUS — The Data Collector
+How Prometheus Works Internally
+PROMETHEUS ARCHITECTURE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Every 15 seconds, Prometheus does this:
+
+1. DISCOVER targets (via Kubernetes service discovery)
+   "Who should I scrape? Find all pods with prometheus.io/scrape=true"
+
+2. SCRAPE each target
+   HTTP GET http://pod-ip:9090/metrics
+   Receives text like:
+   http_requests_total{method="GET",status="200"} 1847
+   http_requests_total{method="GET",status="500"} 3
+   http_request_duration_seconds{le="0.1"} 1200
+   http_request_duration_seconds{le="0.5"} 1800
+
+3. STORE in time-series database (TSDB)
+   Each sample: metric_name{labels} value timestamp
+   Compressed, efficient, fast to query
+
+4. EVALUATE rules every 15 seconds
+   "Is error_rate > 1%? → fire alert to AlertManager"
+
+THE METRIC TYPES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+COUNTER — always goes up, never down
+  http_requests_total = 1,847,293
+  "Total requests since the app started"
+  Use rate() to see requests per second from a counter:
+  rate(http_requests_total[5m]) = 234 requests/second
+
+GAUGE — can go up or down
+  memory_used_bytes = 234567890
+  cpu_utilization = 0.67
+  "Current value right now"
+
+HISTOGRAM — distribution of values in buckets
+  http_request_duration_seconds_bucket{le="0.1"} 1200
+  http_request_duration_seconds_bucket{le="0.5"} 1800
+  http_request_duration_seconds_bucket{le="+Inf"} 2000
+  "How many requests completed within each time threshold"
+  Use histogram_quantile() to get P99:
+  histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))
+
+SUMMARY — pre-computed quantiles (rarely used, prefer histogram)
+
+THE RULE: Use histogram_quantile for latency, rate() for counters.
+PromQL — The Query Language
+# ════════════════════════════════════════════════
+# THE PROMQL PATTERNS YOU WILL USE EVERY DAY
+# Learn these cold — they answer 90% of questions
+# ════════════════════════════════════════════════
+
+# ── TRAFFIC ──
+# Requests per second (RPS) for all endpoints
+sum(rate(http_requests_total[5m]))
+
+# RPS by endpoint and status code
+sum by (path, status) (
+  rate(http_requests_total[5m])
+)
+
+# ── ERRORS ──
+# Error rate (% of requests that are 5xx)
+sum(rate(http_requests_total{status=~"5.."}[5m]))
+/
+sum(rate(http_requests_total[5m]))
+
+# Error rate as percentage
+100 * (
+  sum(rate(http_requests_total{status=~"5.."}[5m]))
+  /
+  sum(rate(http_requests_total[5m]))
+)
+
+# ── LATENCY ──
+# P50, P95, P99 latency (the REAL latency — not average)
+histogram_quantile(0.50,
+  sum by (le) (rate(http_request_duration_seconds_bucket[5m]))
+)
+
+histogram_quantile(0.95,
+  sum by (le) (rate(http_request_duration_seconds_bucket[5m]))
+)
+
+histogram_quantile(0.99,
+  sum by (le) (rate(http_request_duration_seconds_bucket[5m]))
+)
+
+# Latency by endpoint
+histogram_quantile(0.99,
+  sum by (le, path) (rate(http_request_duration_seconds_bucket[5m]))
+)
+
+# ── SATURATION ──
+# CPU utilization per pod
+sum by (pod) (
+  rate(container_cpu_usage_seconds_total{
+    namespace="production",
+    container!=""
+  }[5m])
+)
+
+# Memory utilization vs limit
+container_memory_working_set_bytes{namespace="production"}
+/
+container_spec_memory_limit_bytes{namespace="production"}
+
+# CPU throttling (the silent killer)
+sum by (pod, container) (
+  rate(container_cpu_cfs_throttled_seconds_total{
+    namespace="production"
+  }[5m])
+)
+/
+sum by (pod, container) (
+  rate(container_cpu_cfs_periods_total{
+    namespace="production"
+  }[5m])
+)
+
+# ── KUBERNETES HEALTH ──
+# Pods not in Running state
+kube_pod_status_phase{
+  namespace="production",
+  phase!~"Running|Succeeded"
+}
+
+# Deployment replica mismatch
+kube_deployment_spec_replicas{namespace="production"}
+!=
+kube_deployment_status_replicas_available{namespace="production"}
+
+# Container restart rate (CrashLoopBackOff indicator)
+sum by (pod, container) (
+  rate(kube_pod_container_status_restarts_total{
+    namespace="production"
+  }[15m])
+) * 60 * 15
+
+# Node memory available %
+node_memory_MemAvailable_bytes
+/ node_memory_MemTotal_bytes
+* 100
+
+# ── SLO TRACKING ──
+# Availability over last 30 days
+(
+  1 - (
+    sum(rate(http_requests_total{status=~"5.."}[30d]))
+    /
+    sum(rate(http_requests_total[30d]))
+  )
+) * 100
+
+# Error budget remaining (if SLO = 99.9%)
+# Error budget = 0.1% of requests = 43.8 minutes/month
+(
+  (1 - 0.999) - (
+    sum(rate(http_requests_total{status=~"5.."}[30d]))
+    /
+    sum(rate(http_requests_total[30d]))
+  )
+)
+/
+(1 - 0.999)
+* 100
+# Positive = budget remaining, Negative = SLO breached
+
+
+PART 2: GRAFANA — The Dashboard
+The Golden Signals Dashboard
+# ════════════════════════════════════════════════
+# INSTALL kube-prometheus-stack
+# (includes Prometheus, Grafana, AlertManager,
+#  kube-state-metrics, node-exporter)
+# ════════════════════════════════════════════════
+
+helm repo add prometheus-community \
+  https://prometheus-community.github.io/helm-charts
+helm repo update
+
+kubectl create namespace monitoring
+
+helm install kube-prometheus-stack \
+  prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --version 56.0.0 \
+  --set prometheus.prometheusSpec.retention=30d \
+  --set prometheus.prometheusSpec.retentionSize="40GB" \
+  --set prometheus.prometheusSpec.replicas=2 \
+  --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=gp3 \
+  --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=50Gi \
+  --set prometheus.prometheusSpec.resources.requests.cpu=500m \
+  --set prometheus.prometheusSpec.resources.requests.memory=2Gi \
+  --set prometheus.prometheusSpec.resources.limits.cpu=2 \
+  --set prometheus.prometheusSpec.resources.limits.memory=4Gi \
+  --set grafana.adminPassword=change-me-in-production \
+  --set grafana.persistence.enabled=true \
+  --set grafana.persistence.size=10Gi \
+  --set grafana.sidecar.dashboards.enabled=true \
+  --set grafana.sidecar.dashboards.label=grafana_dashboard \
+  --set alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.resources.requests.storage=10Gi
+
+# Verify everything is running
+kubectl get pods -n monitoring
+kubectl get pvc -n monitoring
+
+# Access Grafana locally
+kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:80 &
+
+# Default login: admin / change-me-in-production
+The Golden Signals Dashboard — Build It as Code
+# Deploy this ConfigMap to add dashboard to Grafana automatically
+# ArgoCD will sync it, Grafana sidecar will load it
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: golden-signals-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"   # This label makes Grafana load it automatically
+data:
+  golden-signals.json: |
+    {
+      "title": "Golden Signals — Production",
+      "uid": "golden-signals-prod",
+      "tags": ["golden-signals", "production", "slo"],
+      "timezone": "UTC",
+      "refresh": "30s",
+      "time": {"from": "now-1h", "to": "now"},
+      "panels": [
+        {
+          "id": 1,
+          "title": "🚦 ERROR RATE — % of requests failing",
+          "type": "timeseries",
+          "description": "SLO target: < 0.1%. Alert at > 1%.",
+          "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "thresholds": {
+                "steps": [
+                  {"color": "green", "value": 0},
+                  {"color": "yellow", "value": 0.1},
+                  {"color": "red", "value": 1}
+                ]
+              }
+            }
+          },
+          "targets": [{
+            "expr": "100 * sum(rate(http_requests_total{namespace='production',status=~'5..'}[5m])) / sum(rate(http_requests_total{namespace='production'}[5m]))",
+            "legendFormat": "Error Rate %"
+          }]
+        },
+        {
+          "id": 2,
+          "title": "⚡ LATENCY — P99 response time",
+          "type": "timeseries",
+          "description": "SLO target: P99 < 500ms. Alert at P99 > 1s.",
+          "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "thresholds": {
+                "steps": [
+                  {"color": "green", "value": 0},
+                  {"color": "yellow", "value": 0.5},
+                  {"color": "red", "value": 1}
+                ]
+              }
+            }
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket{namespace='production'}[5m])))",
+              "legendFormat": "P99"
+            },
+            {
+              "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{namespace='production'}[5m])))",
+              "legendFormat": "P95"
+            },
+            {
+              "expr": "histogram_quantile(0.50, sum by (le) (rate(http_request_duration_seconds_bucket{namespace='production'}[5m])))",
+              "legendFormat": "P50"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "📈 TRAFFIC — Requests per second",
+          "type": "timeseries",
+          "description": "Total RPS split by success/error",
+          "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+          "fieldConfig": {"defaults": {"unit": "reqps"}},
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total{namespace='production',status!~'5..'}[5m]))",
+              "legendFormat": "Success RPS"
+            },
+            {
+              "expr": "sum(rate(http_requests_total{namespace='production',status=~'5..'}[5m]))",
+              "legendFormat": "Error RPS"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "🌡️ SATURATION — CPU + Memory pressure",
+          "type": "timeseries",
+          "description": "Alert when CPU > 80% or Memory > 85%",
+          "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+          "fieldConfig": {"defaults": {"unit": "percent", "max": 100}},
+          "targets": [
+            {
+              "expr": "100 * sum(rate(container_cpu_usage_seconds_total{namespace='production',container!=''}[5m])) / sum(kube_pod_container_resource_limits{namespace='production',resource='cpu'})",
+              "legendFormat": "CPU %"
+            },
+            {
+              "expr": "100 * sum(container_memory_working_set_bytes{namespace='production',container!=''}) / sum(kube_pod_container_resource_limits{namespace='production',resource='memory'})",
+              "legendFormat": "Memory %"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "🎯 SLO — 30-day Availability",
+          "type": "stat",
+          "description": "Target: 99.9% (43.8 min downtime budget)",
+          "gridPos": {"x": 0, "y": 16, "w": 6, "h": 4},
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "thresholds": {
+                "steps": [
+                  {"color": "red", "value": 0},
+                  {"color": "yellow", "value": 99.5},
+                  {"color": "green", "value": 99.9}
+                ]
+              }
+            }
+          },
+          "targets": [{
+            "expr": "100 * (1 - sum(rate(http_requests_total{namespace='production',status=~'5..'}[30d])) / sum(rate(http_requests_total{namespace='production'}[30d])))",
+            "legendFormat": "30d Availability"
+          }]
+        },
+        {
+          "id": 6,
+          "title": "💰 ERROR BUDGET — Remaining this month",
+          "type": "stat",
+          "description": "100% = full budget. 0% = SLO breached.",
+          "gridPos": {"x": 6, "y": 16, "w": 6, "h": 4},
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "thresholds": {
+                "steps": [
+                  {"color": "red", "value": 0},
+                  {"color": "yellow", "value": 25},
+                  {"color": "green", "value": 50}
+                ]
+              }
+            }
+          },
+          "targets": [{
+            "expr": "100 * ((1 - 0.999) - (sum(rate(http_requests_total{namespace='production',status=~'5..'}[30d])) / sum(rate(http_requests_total{namespace='production'}[30d])))) / (1 - 0.999)",
+            "legendFormat": "Budget Remaining"
+          }]
+        },
+        {
+          "id": 7,
+          "title": "🔄 POD RESTARTS — Last 15 minutes",
+          "type": "stat",
+          "description": "Alert if any pod restarts > 3 times",
+          "gridPos": {"x": 12, "y": 16, "w": 6, "h": 4},
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "steps": [
+                  {"color": "green", "value": 0},
+                  {"color": "yellow", "value": 1},
+                  {"color": "red", "value": 3}
+                ]
+              }
+            }
+          },
+          "targets": [{
+            "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace='production'}[15m]))",
+            "legendFormat": "Restarts"
+          }]
+        },
+        {
+          "id": 8,
+          "title": "📦 DEPLOYMENT STATUS",
+          "type": "stat",
+          "description": "Deployments with fewer replicas than desired",
+          "gridPos": {"x": 18, "y": 16, "w": 6, "h": 4},
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "steps": [
+                  {"color": "green", "value": 0},
+                  {"color": "red", "value": 1}
+                ]
+              }
+            }
+          },
+          "targets": [{
+            "expr": "sum(kube_deployment_spec_replicas{namespace='production'} != kube_deployment_status_replicas_available{namespace='production'})",
+            "legendFormat": "Degraded Deployments"
+          }]
+        }
+      ]
+    }
+PART 3: SLO DEFINITIONS — The Contract With Your Users
+Mental Model — SLI, SLO, SLA, Error Budget
+FOUR CONCEPTS — understand ALL of them:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SLI (Service Level Indicator) = The measurement
+"What we actually measure"
+Example: "The fraction of HTTP requests that return 2xx"
+         "P99 latency of POST /api/checkout"
+
+SLO (Service Level Objective) = The target
+"What we commit to internally"
+Example: "99.9% of requests will return 2xx"
+         "P99 latency < 500ms, 99.5% of the time"
+
+SLA (Service Level Agreement) = The legal contract
+"What we promise customers, with penalties if broken"
+Example: "99.5% uptime or we give you service credits"
+Note: SLO should be stricter than SLA
+      SLO = 99.9% means you have buffer before violating SLA (99.5%)
+
+ERROR BUDGET = The allowed failure amount
+"How much can go wrong before we breach the SLO?"
+Calculation: 100% - SLO = error budget percentage
+             99.9% SLO = 0.1% error budget
+             0.1% of 30 days = 43.8 minutes of downtime allowed
+
+ERROR BUDGET USE:
+  Full budget available → engineers can take risks, ship fast
+  50% budget consumed → caution, review risky changes
+  10% budget remaining → freeze non-critical deployments
+  0% budget → SLO breached → incident response, no new features
+
+THE PHILOSOPHY:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Reliability has a cost. Perfect reliability = infinite cost.
+The error budget is the agreement between:
+  Product: "Ship features fast"
+  Platform: "Keep things stable"
+
+When budget is full: "Ship it. We have room to fail."
+When budget is empty: "Freeze features. Fix reliability."
+
+This turns reliability from a conversation about feelings
+into a conversation about NUMBERS.
+That is the entire point.
+Define Your SLOs in Code
+# Apply to Kubernetes cluster via ArgoCD
+# prometheus-rules/slo-definitions.yaml
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: slo-definitions
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+
+spec:
+  groups:
+
+  # ════════════════════════════════════════════════
+  # SLO 1: AVAILABILITY
+  # 99.9% of requests return non-5xx
+  # Error budget: 43.8 minutes/month
+  # ════════════════════════════════════════════════
+  - name: slo.availability
+    interval: 30s
+    rules:
+
+    # Current error rate (5min window)
+    - record: slo:error_rate:5m
+      expr: |
+        sum(rate(http_requests_total{
+          namespace="production",
+          status=~"5.."
+        }[5m]))
+        /
+        sum(rate(http_requests_total{
+          namespace="production"
+        }[5m]))
+
+    # 1-hour error rate
+    - record: slo:error_rate:1h
+      expr: |
+        sum(rate(http_requests_total{
+          namespace="production",
+          status=~"5.."
+        }[1h]))
+        /
+        sum(rate(http_requests_total{
+          namespace="production"
+        }[1h]))
+
+    # 24-hour error rate
+    - record: slo:error_rate:24h
+      expr: |
+        sum(rate(http_requests_total{
+          namespace="production",
+          status=~"5.."
+        }[24h]))
+        /
+        sum(rate(http_requests_total{
+          namespace="production"
+        }[24h]))
+
+    # 30-day availability (for SLO tracking)
+    - record: slo:availability:30d
+      expr: |
+        1 - (
+          sum(rate(http_requests_total{
+            namespace="production",
+            status=~"5.."
+          }[30d]))
+          /
+          sum(rate(http_requests_total{
+            namespace="production"
+          }[30d]))
+        )
+
+    # Error budget remaining (SLO = 99.9%)
+    - record: slo:error_budget_remaining:30d
+      expr: |
+        (
+          (1 - 0.999) - (
+            sum(rate(http_requests_total{
+              namespace="production",
+              status=~"5.."
+            }[30d]))
+            /
+            sum(rate(http_requests_total{
+              namespace="production"
+            }[30d]))
+          )
+        )
+        /
+        (1 - 0.999)
+
+    # ALERT: Fast burn rate (using budget too fast)
+    # If error rate is 14x the SLO threshold
+    # You'll exhaust the hourly budget in 1 hour
+    - alert: SLOErrorBudgetFastBurn
+      expr: |
+        (
+          slo:error_rate:5m > (14 * 0.001)
+          and
+          slo:error_rate:1h > (14 * 0.001)
+        )
+      for: 2m
+      labels:
+        severity: critical
+        slo: availability
+      annotations:
+        summary: "CRITICAL: Fast error budget burn — SLO at risk"
+        description: |
+          Error rate {{ $value | humanizePercentage }} is 14x the SLO threshold.
+          At this rate, you'll exhaust the monthly budget in 1 hour.
+          Current budget remaining: {{ printf "%.1f" (query "slo:error_budget_remaining:30d" | first | value | mul 100) }}%
+
+    # ALERT: Slow burn rate (gradual degradation)
+    - alert: SLOErrorBudgetSlowBurn
+      expr: |
+        (
+          slo:error_rate:1h > (6 * 0.001)
+          and
+          slo:error_rate:24h > (6 * 0.001)
+        )
+      for: 15m
+      labels:
+        severity: warning
+        slo: availability
+      annotations:
+        summary: "WARNING: Slow error budget burn"
+        description: |
+          Error rate is consistently 6x the SLO threshold.
+          Budget will be exhausted in approximately 5 days.
+
+    # ALERT: SLO BREACHED
+    - alert: SLOAvailabilityBreached
+      expr: slo:error_budget_remaining:30d < 0
+      labels:
+        severity: critical
+        slo: availability
+      annotations:
+        summary: "SLO BREACHED: Availability below 99.9%"
+        description: |
+          30-day availability is {{ printf "%.3f" (query "slo:availability:30d" | first | value | mul 100) }}%
+          which is below the 99.9% SLO.
+          Error budget is {{ printf "%.1f" (query "slo:error_budget_remaining:30d" | first | value | mul 100) }}% remaining.
+
+  # ════════════════════════════════════════════════
+  # SLO 2: LATENCY
+  # 99% of requests complete in < 500ms
+  # ════════════════════════════════════════════════
+  - name: slo.latency
+    interval: 30s
+    rules:
+
+    # What fraction of requests are "good" (< 500ms)?
+    - record: slo:latency_good_requests:5m
+      expr: |
+        sum(rate(http_request_duration_seconds_bucket{
+          namespace="production",
+          le="0.5"
+        }[5m]))
+        /
+        sum(rate(http_request_duration_seconds_count{
+          namespace="production"
+        }[5m]))
+
+    - record: slo:latency_good_requests:30d
+      expr: |
+        sum(rate(http_request_duration_seconds_bucket{
+          namespace="production",
+          le="0.5"
+        }[30d]))
+        /
+        sum(rate(http_request_duration_seconds_count{
+          namespace="production"
+        }[30d]))
+
+    # Latency SLO target: 99% of requests < 500ms
+    - alert: SLOLatencyBreached
+      expr: slo:latency_good_requests:5m < 0.99
+      for: 5m
+      labels:
+        severity: warning
+        slo: latency
+      annotations:
+        summary: "Latency SLO breached: P99 > 500ms"
+        description: |
+          Only {{ $value | humanizePercentage }} of requests complete within 500ms.
+          SLO requires 99%.
+PART 4: ALERT STRATEGY — The Right Alert at the Right Time
+The Alert Philosophy
+THE PROBLEM WITH BAD ALERTING:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TOO MANY ALERTS:
+Alert fires → engineer ignores it → it was a false alarm → next time
+alert fires → engineer ignores it → IT WAS REAL → production down
+This is called alert fatigue. It kills people.
+
+TOO FEW ALERTS:
+User: "Your site has been down for 2 hours"
+Engineer: "What? We had no idea"
+This is called flying blind. Also bad.
+
+THE RIGHT ALERTS:
+Every alert that fires = requires HUMAN action
+Every alert that fires = engineer can do something about it
+Every alert that fires = something is wrong RIGHT NOW or will be soon
+If an alert fires and you look at it and do nothing → it's a bad alert
+Delete bad alerts. Treat alert quality like code quality.
+
+ALERT SEVERITY LEVELS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CRITICAL → Page on-call IMMEDIATELY (even at 3am)
+           Users are being impacted RIGHT NOW
+           Examples: error rate > 5%, service completely down
+           Response time: < 5 minutes
+
+WARNING  → Slack notification (check within business hours)
+           Something will break if not addressed
+           Examples: disk > 80%, error rate > 1%, latency rising
+           Response time: < 4 hours
+
+INFO     → Dashboard / ticket (review regularly)
+           Informational, no immediate action needed
+           Examples: deployment happened, scaling event
+           Response time: next business day
+
+DEAD LETTER → Never page. Just log.
+           Background noise, expected behavior
+           Examples: health check bounces, config reloads
+Complete Alert Rules
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: production-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+
+spec:
+  groups:
+
+  # ════════════════════════════════════════════════
+  # APPLICATION ALERTS
+  # ════════════════════════════════════════════════
+  - name: application.critical
+    rules:
+
+    - alert: HighErrorRate
+      expr: |
+        (
+          sum(rate(http_requests_total{
+            namespace="production",
+            status=~"5.."
+          }[5m]))
+          /
+          sum(rate(http_requests_total{namespace="production"}[5m]))
+        ) > 0.05
+      for: 2m
+      labels:
+        severity: critical
+        team: platform
+      annotations:
+        summary: "CRITICAL: Error rate > 5%"
+        description: |
+          Error rate is {{ $value | humanizePercentage }}.
+          Impact: Users receiving errors right now.
+          Runbook: https://wiki.mycompany.com/runbooks/high-error-rate
+        dashboard: "https://grafana.mycompany.com/d/golden-signals-prod"
+
+    - alert: ServiceDown
+      expr: |
+        sum(up{namespace="production"}) == 0
+      for: 1m
+      labels:
+        severity: critical
+        team: platform
+      annotations:
+        summary: "CRITICAL: All production targets are DOWN"
+        description: "No production pods are reachable by Prometheus."
+        runbook: "https://wiki.mycompany.com/runbooks/service-down"
+
+    - alert: HighLatency
+      expr: |
+        histogram_quantile(0.99,
+          sum by (le) (
+            rate(http_request_duration_seconds_bucket{
+              namespace="production"
+            }[5m])
+          )
+        ) > 2
+      for: 5m
+      labels:
+        severity: critical
+        team: platform
+      annotations:
+        summary: "CRITICAL: P99 latency > 2 seconds"
+        description: |
+          P99 latency is {{ $value | humanizeDuration }}.
+          Users are experiencing very slow responses.
+
+    - alert: PodCrashLooping
+      expr: |
+        rate(kube_pod_container_status_restarts_total{
+          namespace="production"
+        }[15m]) * 60 * 15 > 3
+      for: 5m
+      labels:
+        severity: critical
+        team: platform
+      annotations:
+        summary: "CRITICAL: Pod {{ $labels.pod }} is crash looping"
+        description: |
+          Pod {{ $labels.namespace }}/{{ $labels.pod }}
+          container {{ $labels.container }} has restarted
+          {{ $value | printf "%.0f" }} times in 15 minutes.
+
+    - alert: OOMKilled
+      expr: |
+        kube_pod_container_status_last_terminated_reason{
+          reason="OOMKilled",
+          namespace="production"
+        } > 0
+      labels:
+        severity: critical
+        team: platform
+      annotations:
+        summary: "CRITICAL: Container OOMKilled"
+        description: |
+          {{ $labels.namespace }}/{{ $labels.pod }}/{{ $labels.container }}
+          was OOM killed. Increase memory limits.
+
+  - name: application.warning
+    rules:
+
+    - alert: ModerateErrorRate
+      expr: |
+        (
+          sum(rate(http_requests_total{
+            namespace="production",
+            status=~"5.."
+          }[5m]))
+          /
+          sum(rate(http_requests_total{namespace="production"}[5m]))
+        ) > 0.01
+      for: 5m
+      labels:
+        severity: warning
+        team: platform
+      annotations:
+        summary: "WARNING: Error rate > 1%"
+        description: "Error rate {{ $value | humanizePercentage }}. Investigate before it gets worse."
+
+    - alert: DeploymentReplicasMismatch
+      expr: |
+        kube_deployment_spec_replicas{namespace="production"}
+        !=
+        kube_deployment_status_replicas_available{namespace="production"}
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "WARNING: Deployment {{ $labels.deployment }} has replica mismatch"
+
+    - alert: CPUThrottlingHigh
+      expr: |
+        sum by (pod, container) (
+          rate(container_cpu_cfs_throttled_seconds_total{
+            namespace="production"
+          }[5m])
+        )
+        /
+        sum by (pod, container) (
+          rate(container_cpu_cfs_periods_total{
+            namespace="production"
+          }[5m])
+        ) > 0.25
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "CPU throttling > 25% on {{ $labels.pod }}/{{ $labels.container }}"
+        description: "Increase CPU limits or reduce CPU requests to fix ratio"
+
+  # ════════════════════════════════════════════════
+  # INFRASTRUCTURE ALERTS
+  # ════════════════════════════════════════════════
+  - name: infrastructure.critical
+    rules:
+
+    - alert: NodeMemoryPressure
+      expr: |
+        node_memory_MemAvailable_bytes
+        /
+        node_memory_MemTotal_bytes < 0.10
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "CRITICAL: Node {{ $labels.instance }} memory < 10%"
+
+    - alert: NodeDiskPressure
+      expr: |
+        (
+          node_filesystem_size_bytes{fstype!="tmpfs"}
+          - node_filesystem_free_bytes{fstype!="tmpfs"}
+        )
+        /
+        node_filesystem_size_bytes{fstype!="tmpfs"} > 0.90
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "CRITICAL: Node {{ $labels.instance }} disk > 90%"
+
+    - alert: PVCAlmostFull
+      expr: |
+        kubelet_volume_stats_used_bytes
+        /
+        kubelet_volume_stats_capacity_bytes > 0.85
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} > 85% full"
+AlertManager Routing — Who Gets Paged for What
+# alertmanager-config.yaml
+# Applied via Helm values or directly to AlertManager
+
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: production-routing
+  namespace: monitoring
+
+spec:
+  route:
+    # Default: group alerts, wait 30s to batch, repeat every 12h
+    groupBy: ['alertname', 'namespace', 'severity']
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 12h
+    receiver: slack-warnings
+
+    routes:
+    # CRITICAL → PagerDuty (wakes people up)
+    - matchers:
+      - name: severity
+        value: critical
+      receiver: pagerduty-critical
+      repeatInterval: 30m    # Re-alert every 30 min if not acknowledged
+
+    # SLO alerts → dedicated channel
+    - matchers:
+      - name: slo
+        matchType: =~
+        value: ".+"
+      receiver: slack-slo
+      groupBy: ['slo', 'alertname']
+
+    # Warning → Slack only
+    - matchers:
+      - name: severity
+        value: warning
+      receiver: slack-warnings
+
+  receivers:
+  - name: pagerduty-critical
+    pagerDutyConfigs:
+    - routingKey: $PAGERDUTY_ROUTING_KEY
+      severity: critical
+      description: |
+        {{ range .Alerts }}
+        {{ .Annotations.summary }}
+        {{ .Annotations.description }}
+        {{ end }}
+      links:
+      - href: "{{ (index .Alerts 0).Annotations.dashboard }}"
+        text: "Grafana Dashboard"
+
+  - name: slack-warnings
+    slackConfigs:
+    - apiURL: $SLACK_WEBHOOK_URL
+      channel: '#alerts-warnings'
+      sendResolved: true
+      color: |
+        {{ if eq .Status "firing" }}
+          {{ if eq (index .Alerts 0).Labels.severity "critical" }}danger
+          {{ else }}warning{{ end }}
+        {{ else }}good{{ end }}
+      title: |
+        {{ if eq .Status "firing" }}🔥 {{ else }}✅ {{ end }}
+        [{{ .Status | toUpper }}] {{ (index .Alerts 0).Annotations.summary }}
+      text: |
+        {{ range .Alerts }}
+        *Description:* {{ .Annotations.description }}
+        *Namespace:* {{ .Labels.namespace }}
+        *Severity:* {{ .Labels.severity }}
+        {{ end }}
+
+  - name: slack-slo
+    slackConfigs:
+    - apiURL: $SLACK_WEBHOOK_URL
+      channel: '#slo-tracking'
+      sendResolved: true
+      title: "📊 SLO Alert: {{ (index .Alerts 0).Annotations.summary }}"
+      text: |
+        {{ range .Alerts }}
+        {{ .Annotations.description }}
+        {{ end }}
+
+  inhibitRules:
+  # If ServiceDown fires, suppress all other alerts
+  # (don't page for symptoms when you know the root cause)
+  - sourceMatchers:
+    - name: alertname
+      value: ServiceDown
+    targetMatchers:
+    - name: namespace
+      value: production
+    equal: ['namespace']
+PART 5: CHAOS ENGINEERING — Break It on Purpose
+Mental Model — The Fire Drill
+CHAOS ENGINEERING is like a fire drill for your software.
+
+A fire drill:
+→ You set off the alarm on PURPOSE
+→ Everyone practices evacuating
+→ You find the broken exit door BEFORE a real fire
+→ You fix it
+→ Real fire comes: evacuation is smooth, lives saved
+
+Chaos engineering:
+→ You break the system on PURPOSE
+→ Team practices incident response
+→ You find the single point of failure BEFORE production breaks
+→ You fix it
+→ Real failure comes: team handles it smoothly, users barely notice
+
+THE CHAOS MATURITY MODEL:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Level 0: We don't test failure
+         "It's never failed so it must be fine"
+         → You have no idea what will break
+
+Level 1: We test failure in dev/staging
+         "We simulate failures in lower environments"
+         → Better, but production always surprises you
+
+Level 2: We test failure in production (small scale)
+         "We deliberately kill one pod in production"
+         → You KNOW the system handles pod failure
+
+Level 3: Continuous chaos
+         "Chaos runs automatically every day in production"
+         → Netflix Chaos Monkey level. True confidence.
+
+YOU ARE TARGETING LEVEL 2.
+Start controlled. Measure everything. Build confidence.
+
+HYPOTHESIS FORMAT:
+Before every chaos experiment, write a hypothesis:
+"If [failure], then [expected behavior], because [reason]"
+
+"If one pod dies, then error rate stays < 0.1%,
+ because we have 3 replicas and HPA will replace it."
+
+If the hypothesis is WRONG → you found a weakness → fix it.
+If the hypothesis is RIGHT → you have PROOF of resilience.
+Chaos Experiments — Step by Step
+# ════════════════════════════════════════════════
+# SETUP: Install Chaos Mesh
+# Open-source chaos engineering platform for Kubernetes
+# ════════════════════════════════════════════════
+
+helm repo add chaos-mesh https://charts.chaos-mesh.org
+helm repo update
+
+kubectl create namespace chaos-testing
+
+helm install chaos-mesh chaos-mesh/chaos-mesh \
+  --namespace chaos-testing \
+  --set chaosDaemon.runtime=containerd \
+  --set chaosDaemon.socketPath=/run/containerd/containerd.sock \
+  --set dashboard.create=true \
+  --set dashboard.securityMode=false
+
+# Verify
+kubectl get pods -n chaos-testing
+
+# Access dashboard
+kubectl port-forward -n chaos-testing svc/chaos-dashboard 2333:2333 &
+
+# ════════════════════════════════════════════════
+# MEASUREMENT SETUP
+# Always measure BEFORE and DURING chaos
+# ════════════════════════════════════════════════
+
+measure_baseline() {
+  echo "=== BASELINE MEASUREMENT at $(date '+%H:%M:%S') ==="
+
+  # Current error rate
+  ERROR_RATE=$(kubectl exec -n monitoring \
+    $(kubectl get pod -n monitoring -l app=prometheus -o name | head -1) \
+    -- wget -qO- 'http://localhost:9090/api/v1/query?query=sum(rate(http_requests_total{namespace="production",status=~"5.."}[2m]))/sum(rate(http_requests_total{namespace="production"}[2m]))*100' \
+    | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['data']['result'][0]['value'][1] if d['data']['result'] else '0')")
+
+  # Current P99 latency
+  P99=$(kubectl exec -n monitoring \
+    $(kubectl get pod -n monitoring -l app=prometheus -o name | head -1) \
+    -- wget -qO- "http://localhost:9090/api/v1/query?query=histogram_quantile(0.99,sum+by+(le)(rate(http_request_duration_seconds_bucket{namespace='production'}[2m])))" \
+    | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['data']['result'][0]['value'][1] if d['data']['result'] else '0')")
+
+  echo "Error Rate: ${ERROR_RATE}%"
+  echo "P99 Latency: ${P99}s"
+
+  # Pod count
+  PODS=$(kubectl get pods -n production --no-headers | grep Running | wc -l)
+  echo "Running Pods: $PODS"
+
+  echo ""
+}
+
+# ════════════════════════════════════════════════
+# EXPERIMENT 1: Pod Kill
+# Hypothesis: Killing 1 of 3 pods has zero user impact
+# because remaining pods absorb traffic and HPA replaces
+# ════════════════════════════════════════════════
+
+echo "=== EXPERIMENT 1: POD KILL ==="
+echo "Hypothesis: Killing 1 pod causes < 0.1% error rate increase"
+echo "Duration: 5 minutes"
+echo ""
+
+measure_baseline
+
+T_START=$(date +%s)
+
+# METHOD A: Direct kubectl (simple, no Chaos Mesh needed)
+TARGET_POD=$(kubectl get pods -n production -l app=api \
+  --no-headers | head -1 | awk '{print $1}')
+echo "CHAOS: Killing pod $TARGET_POD at $(date '+%H:%M:%S')"
+kubectl delete pod $TARGET_POD -n production
+
+# METHOD B: Chaos Mesh pod failure
+kubectl apply - << 'EOF'
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-kill-experiment
+  namespace: chaos-testing
+spec:
+  action: pod-kill
+  mode: one        # Kill exactly one pod
+  selector:
+    namespaces:
+    - production
+    labelSelectors:
+      app: api
+  duration: "5m"   # Run for 5 minutes
+EOF
+
+# Monitor during chaos
+for i in $(seq 1 10); do
+  sleep 30
+  measure_baseline
+done
+
+# Collect results
+T_END=$(date +%s)
+MTTR=$((T_END - T_START))
+echo "Time to recovery: ${MTTR} seconds"
+echo "EXPERIMENT 1 COMPLETE"
+
+# Clean up
+kubectl delete podchaos pod-kill-experiment -n chaos-testing
+
+# ════════════════════════════════════════════════
+# EXPERIMENT 2: Network Latency Injection
+# Hypothesis: 500ms added latency causes P99 to breach SLO
+# but error rate stays low (requests are slow, not failing)
+# ════════════════════════════════════════════════
+
+echo "=== EXPERIMENT 2: NETWORK LATENCY ==="
+echo "Hypothesis: Adding 500ms latency → P99 > 1s but error rate < 1%"
+
+measure_baseline
+
+kubectl apply - << 'EOF'
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: latency-injection
+  namespace: chaos-testing
+spec:
+  action: delay
+  mode: all         # Apply to all matching pods
+  selector:
+    namespaces:
+    - production
+    labelSelectors:
+      app: api
+  delay:
+    latency: "500ms"
+    correlation: "50"   # 50% correlation between packets
+    jitter: "100ms"     # Random variation ±100ms
+  duration: "10m"
+  direction: both       # Both inbound and outbound
+EOF
+
+echo "Latency injected. Measuring impact..."
+for i in $(seq 1 6); do
+  sleep 60
+  measure_baseline
+  echo "--- 1 minute elapsed ---"
+done
+
+kubectl delete networkchaos latency-injection -n chaos-testing
+echo "EXPERIMENT 2 COMPLETE"
+
+# ════════════════════════════════════════════════
+# EXPERIMENT 3: Memory Pressure
+# Hypothesis: OOM of one pod causes brief error spike
+# then recovery as HPA replaces pod
+# ════════════════════════════════════════════════
+
+echo "=== EXPERIMENT 3: MEMORY PRESSURE ==="
+
+kubectl apply - << 'EOF'
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: memory-stress
+  namespace: chaos-testing
+spec:
+  mode: one
+  selector:
+    namespaces:
+    - production
+    labelSelectors:
+      app: api
+  stressors:
+    memory:
+      workers: 4
+      size: "256MB"   # Consume 256MB extra memory
+  duration: "5m"
+EOF
+
+T_STRESS_START=$(date +%s)
+
+for i in $(seq 1 5); do
+  sleep 60
+  measure_baseline
+  # Check if OOM occurred
+  OOM=$(kubectl get events -n production \
+    --field-selector reason=OOMKilling \
+    --sort-by='.lastTimestamp' 2>/dev/null | tail -1)
+  if [ -n "$OOM" ]; then
+    T_OOM=$(date +%s)
+    echo "OOM DETECTED: $OOM"
+    echo "Time to OOM: $((T_OOM - T_STRESS_START)) seconds"
+  fi
+done
+
+kubectl delete stresschaos memory-stress -n chaos-testing
+
+# ════════════════════════════════════════════════
+# EXPERIMENT 4: Node Failure (AZ Simulation)
+# Hypothesis: Cordoning all pods in AZ-a and deleting them
+# causes pods to reschedule in AZ-b with < 30s of impact
+# ════════════════════════════════════════════════
+
+echo "=== EXPERIMENT 4: AZ FAILURE SIMULATION ==="
+
+# Get nodes in us-east-1a
+AZ_A_NODES=$(kubectl get nodes \
+  -l topology.kubernetes.io/zone=us-east-1a \
+  -o jsonpath='{.items[*].metadata.name}')
+
+echo "Simulating AZ us-east-1a failure"
+echo "Nodes: $AZ_A_NODES"
+
+T_AZ_START=$(date +%s)
+measure_baseline
+
+# Cordon all 1a nodes (no new pods)
+for NODE in $AZ_A_NODES; do
+  kubectl cordon $NODE
+done
+
+# Drain pods from 1a nodes (simulate AZ failure)
+for NODE in $AZ_A_NODES; do
+  kubectl drain $NODE \
+    --ignore-daemonsets \
+    --delete-emptydir-data \
+    --force \
+    --timeout=60s &
+done
+wait
+
+echo "All 1a nodes drained"
+T_DRAINED=$(date +%s)
+echo "Time to drain: $((T_DRAINED - T_AZ_START)) seconds"
+
+# Measure recovery
+for i in $(seq 1 6); do
+  sleep 30
+  measure_baseline
+done
+
+T_RECOVERED=$(date +%s)
+
+# Uncordon nodes
+for NODE in $AZ_A_NODES; do
+  kubectl uncordon $NODE
+done
+
+MTTR=$((T_RECOVERED - T_AZ_START))
+echo "AZ RECOVERY TIME: ${MTTR} seconds"
+echo "EXPERIMENT 4 COMPLETE"
+
+# ════════════════════════════════════════════════
+# EXPERIMENT 5: Database Connection Exhaustion
+# Hypothesis: DB connection pool full causes 500 errors
+# until PgBouncer pool is cleared or pods restart
+# ════════════════════════════════════════════════
+
+echo "=== EXPERIMENT 5: DB CONNECTION EXHAUSTION ==="
+
+# Simulate by connecting to DB many times from bastion
+# (requires bastion SSH access — run from bastion)
+ssh ec2-user@$BASTION_IP << 'REMOTE_EOF'
+for i in $(seq 1 90); do
+  PGPASSWORD=$DB_PASS psql -h $RDS_ENDPOINT \
+    -U dbadmin -d appdb \
+    -c "SELECT pg_sleep(300);" &
+  echo "Connection $i opened"
+  sleep 0.1
+done
+echo "90 connections open — DB exhausted"
+# Press ctrl+c to release connections when test is done
+REMOTE_EOF
+PART 6: MEASURE MTTR — The Most Important Number
+# ════════════════════════════════════════════════
+# MTTR MEASUREMENT FRAMEWORK
+# MTTR = Mean Time To Recovery
+# The lower the MTTR, the more reliable you are
+# ════════════════════════════════════════════════
+
+# For each experiment, record:
+# T0 = when failure was INJECTED
+# T1 = when alert FIRED (detection time)
+# T2 = when engineer ACKNOWLEDGED (response time)
+# T3 = when system RECOVERED (recovery time)
+
+# MTTR = T3 - T0 (total time to recovery)
+# MTTD = T1 - T0 (time to detect)
+# MTTR_response = T2 - T1 (time to respond)
+# MTTR_fix = T3 - T2 (time to fix)
+
+calculate_mttr() {
+  EXPERIMENT=$1
+  T0=$2  # Failure injected (unix timestamp)
+  T1=$3  # Alert fired
+  T2=$4  # Acknowledged
+  T3=$5  # Recovered
+
+  echo "=== MTTR for $EXPERIMENT ==="
+  echo "Time to detect:  $((T1 - T0)) seconds"
+  echo "Time to respond: $((T2 - T1)) seconds"
+  echo "Time to fix:     $((T3 - T2)) seconds"
+  echo "TOTAL MTTR:      $((T3 - T0)) seconds ($(((T3-T0)/60)) minutes)"
+  echo ""
+}
+
+# ════════════════════════════════════════════════
+# AUTOMATED MTTR TRACKING VIA PROMETHEUS
+# ════════════════════════════════════════════════
+
+# Record when alert fires
+kubectl apply - << 'EOF'
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: mttr-tracking
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+  - name: mttr.tracking
+    rules:
+
+    # Track how long we've been in "bad" state
+    - record: slo:incident_duration_seconds
+      expr: |
+        (
+          sum(rate(http_requests_total{
+            namespace="production",
+            status=~"5.."
+          }[5m]))
+          /
+          sum(rate(http_requests_total{namespace="production"}[5m]))
+        ) > 0.01   # Only when error rate > 1%
+
+    # Alert with timestamp annotation for MTTR tracking
+    - alert: IncidentStarted
+      expr: |
+        (
+          sum(rate(http_requests_total{
+            namespace="production",
+            status=~"5.."
+          }[5m]))
+          /
+          sum(rate(http_requests_total{namespace="production"}[5m]))
+        ) > 0.05
+      for: 1m
+      labels:
+        severity: critical
+        incident: "true"
+      annotations:
+        summary: "Incident started"
+        fired_at: "{{ .StartsAt }}"
+        description: "Error rate {{ $value | humanizePercentage }}"
+EOF
+# --------------------------------------------------------------
 # You are a Principal Platform Engineer, DevSecOps Engineer, Site Reliability Engineer (SRE), Cloud Architect, and Systems Engineer with 20+ years running production infrastructure at global scale — the kind of engineer who owns systems end-to-end, has stopped live outages, migrated hundreds of servers, cut cloud bills materially, and secured production environments against real attackers. Assume the mindset of a white-hat who has spent years on offensive security ("red team") before moving to defense — you know what attackers look for because you've been trained to find it.
 
 You are not a script writer or template deployer. You are a systems engineer, reliability engineer, and platform architect. Act accordingly in every answer.
