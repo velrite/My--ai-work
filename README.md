@@ -1,3 +1,22 @@
+The most impressive project you can build on your velrite GitHub is NOVA — An Ephemeral On-Demand Staging Platform with Automated FinOps & Zero-Trust Governance.CTOs do not care about generic Kubernetes clusters; they care about cloud cost waste (idle staging environments running 24/7) and developer velocity bottlenecks (developers blocking each other waiting for a single shared QA environment). This project solves both simultaneously by building a platform that automatically provisions lightweight, isolated preview environments on every GitHub Pull Request and destroys them the instant the PR merges or sits idle after business hours.Project Architecture & Tech Stack[GitHub PR Event] 
+       │
+       ▼
+[GitHub Actions (Keyless Workload Identity)] ──(Trivy / Syft / Cosign)──► [Container Registry]
+       │
+       ▼
+[Argo CD ApplicationSet Generator]
+       │
+       ▼
+[AWS EKS / GKE Cluster] ◄──(Karpenter Spot Autoscaling)
+       ├──► [Ephemeral Namespace] (Dynamic Preview App + DB)
+       ├──► [Kyverno Admission Controller] (Enforces Non-Root & Signed Image Verification)
+       ├──► [OpenCost + KEDA Cron] (Auto-scales workloads to 0 replicas past 7 PM)
+       └──► [Prometheus + Grafana] (Real-time Cost Per PR & Provisioning Latency)
+The Core Capabilities to ProveCapabilityTechnical ImplementationBusiness Outcome / CTO PitchDynamic PR EnvironmentsArgo CD ApplicationSet pull-request generator automatically provisions an isolated Kubernetes namespace per GitHub PR with an ingress endpoint.Eliminates QA bottlenecks; every developer gets their own production-like test URL instantly.FinOps & Auto-TeardownKarpenter for fast Spot-instance provisioning, paired with OpenCost metrics and KEDA cron schedules that scale non-prod workloads to 0 replicas outside business hours (7 PM – 7 AM).Cuts idle non-production cloud compute costs by 60%–70%.Zero-Trust Supply ChainKeyless authentication via Workload Identity Federation, Trivy vulnerability scanning, Cosign artifact signing, and Kyverno policy enforcement blocking unsigned containers.Guarantees that code running in preview environments adheres to strict enterprise compliance (SOC2/ISO27001).Self-Healing & Drift CorrectionArgo CD automated sync enabled with Prune=true and SelfHeal=true to revert any manual kubectl overrides within 5 seconds.Prevents configuration drift and manual "hotfixing" in staging environments.How to Structure the velrite/nova-ephemeral-idp RepositoryTo match your empirical, proof-driven profile, structure the repository around verified test output rather than theoretical diagrams:README.md (The Executive Summary):Measured Performance Benchmarks: Include exact timing metrics (e.g., PR Environment Provisioning Latency: 94 seconds, Spot Instance Re-provisioning: 18 seconds, Idle Cost Reduction: 68%).Architecture Diagram: A clear Mermaid.js sequence diagram showing the GitOps flow from PR creation to cluster teardown.Verified vs. Out-of-Scope Table: Explicitly list what was load-tested live vs. mocked.terraform/ (IaC Infrastructure):Modular Terraform code for EKS/GKE cluster provisioning, Karpenter node pools, and Workload Identity Federation bindings.gitops/ (Argo CD & Security Manifests):applicationset.yaml configured with the GitHub PR generator.Kyverno cluster policies blocking privileged containers and enforcing image signature verification.KEDA ScaledObject manifests configured with time-based cron triggers.docs/incidents/ (Real Test Artifacts):Document 2–3 failure modes you tested (e.g., Simulated Karpenter Spot interruption during PR deployment, Kyverno policy violation block on unsigned image, KEDA cron scale-down test output logs).
+
+
+# -----------------------------------
+
 To maximize your income as a remote Platform / DevSecOps Engineer based in Nigeria, split your energy across three distinct channels: short-term cashflow, high-rate enterprise freelancing, and full-time remote startup roles.
 
 ### Energy Allocation Breakdown
