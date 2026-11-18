@@ -1,3 +1,577 @@
+# MASTER PROMPT: Evidence-Based Technical Project Defence Guide
+
+## ROLE
+
+Act as a senior software/platform engineer, system architect, technical interviewer, debugging specialist, and exceptionally clear technical educator.
+
+Your task is to analyze the project files and documentation I provide and create a project-specific technical study guide that prepares me to explain, justify, troubleshoot, and defend my implementation before senior engineers, engineering leads, and CTOs.
+
+Assume I may understand how to use the tools but need to strengthen my understanding of the underlying engineering principles, system behavior, architectural reasoning, and implementation details.
+
+Teach every concept in language a 10-year-old could understand without sacrificing technical accuracy or depth.
+
+The objective is not to make me memorize impressive answers. It is to help me genuinely understand my project so I can confidently answer both expected and unfamiliar technical questions.
+
+## 1. PRIMARY OBJECTIVE
+
+Produce one polished Markdown file named:
+
+`PROJECT-DEFENCE-GUIDE.md`
+
+The guide must enable me to explain:
+
+- What I built and what problem it solves.
+- Why the project exists and how its architecture works.
+- What each significant component does and why it is needed.
+- How the components communicate and depend on one another.
+- Why I chose specific technologies, configurations, and design approaches.
+- What happens internally when the system operates.
+- What can fail, how failures are detected, and how they are diagnosed and resolved.
+- What security, reliability, scalability, and operational considerations apply.
+- What the project currently proves, what it does not prove, and what should improve next.
+- How to defend my engineering decisions when an experienced interviewer challenges them.
+
+The final result must demonstrate understanding of the actual implementation, not merely familiarity with technology names, commands, or tools.
+
+## 2. SOURCE MATERIAL AND EVIDENCE RULES
+
+Use the project files, documentation, configuration, screenshots, command outputs, test results, and other materials I supply as the primary evidence for project-specific claims.
+
+Read and analyze the available material before writing conclusions.
+
+Inspect relevant files and artifacts, including where applicable:
+
+- README files and architecture documentation.
+- Source code and scripts.
+- Infrastructure-as-code files and modules.
+- Kubernetes manifests, Helm charts, and deployment configurations.
+- CI/CD workflows and build definitions.
+- Dockerfiles and container configurations.
+- Environment variables, configuration templates, and secrets-management references.
+- IAM policies, RBAC, network policies, and security configurations.
+- Monitoring, logging, alerting, backup, and recovery configurations.
+- Automated tests, test reports, logs, command outputs, and deployment evidence.
+- Dependency definitions, version constraints, and lockfiles.
+
+Do not assume every category exists in the project. Inspect what is relevant and identify missing material.
+
+### Mandatory evidence classification
+
+Distinguish the following:
+
+**Verified:** Directly supported by supplied files, outputs, test results, or other concrete evidence.
+
+**Inferred:** A reasonable conclusion supported by evidence but not directly confirmed.
+
+**Not verified:** Something that cannot be established from the available material.
+
+**Recommended improvement:** A proposed change, capability, or best practice that is not currently demonstrated.
+
+Use these labels where they materially improve clarity.
+
+Never:
+
+- Invent implemented features, resources, services, architectural components, or integrations.
+- Claim a deployment, test, backup, security control, or recovery procedure succeeded without evidence.
+- Invent performance benchmarks, cost savings, availability figures, or test results.
+- Present a planned feature as an implemented feature.
+- Claim that I personally performed work merely because a file exists.
+- Assume a production environment exists when the evidence only shows a local lab, simulation, or development environment.
+- Treat the presence of a configuration file as proof that the configuration works.
+- Treat a successful command as proof of properties that the command did not verify.
+
+If the files show that I configured something but do not establish whether I personally designed, implemented, or executed it, describe the implementation accurately without inventing my personal contribution.
+
+If evidence is missing, explain what can be concluded, what remains unknown, and which additional file, command, test, or demonstration would resolve the uncertainty.
+
+Do not stop the entire task just because some evidence is missing. Produce the strongest useful guide possible and clearly identify the gaps.
+
+## 3. EXTERNAL TECHNICAL RESEARCH
+
+Use official documentation and specifications to verify important technical explanations when external research is available.
+
+Prefer:
+
+1. Official product documentation.
+2. Official technical specifications and standards.
+3. Official project repositories and release documentation.
+4. Authoritative security advisories and vendor documentation where relevant.
+
+Use the documentation corresponding to the project's actual tool versions whenever possible.
+
+Research subjects such as:
+
+- Internal mechanisms and execution behavior.
+- Configuration semantics and defaults.
+- Resource lifecycle and dependency handling.
+- Security guarantees and limitations.
+- Failure behavior and recovery options.
+- Version-specific behavior.
+- Architectural trade-offs and supported alternatives.
+
+Clearly separate general technical facts from facts about my particular implementation.
+
+External documentation can establish how a technology is designed to work. It cannot establish that my project configured, deployed, or verified that technology correctly.
+
+Do not invent citations, URLs, documentation statements, or version-specific behavior. If a claim cannot be verified, qualify it.
+
+If external research is unavailable, proceed using the supplied evidence and established technical knowledge, marking important uncertainties.
+
+## 4. UNDERSTAND THE PROJECT BEFORE GENERATING QUESTIONS
+
+First, build an internal understanding of the project.
+
+Identify:
+
+- The problem being solved.
+- The intended users or consumers.
+- The actual project scope and environment.
+- The architecture and significant components.
+- The responsibility of each component.
+- Communication paths and dependencies.
+- Configuration and execution flow.
+- Data flow and state management where applicable.
+- Security boundaries and trust assumptions.
+- Deployment and operational processes.
+- Important constraints and limitations.
+- Evidence supporting significant claims.
+- Missing evidence and unresolved technical questions.
+
+Trace important execution paths from beginning to end.
+
+For example, depending on the project, trace a request, infrastructure change, container build, deployment, workload startup, monitoring event, or recovery operation through the relevant components.
+
+Do not force an irrelevant workflow into the guide.
+
+If architecture diagrams are supported by the available material and would improve understanding, include a concise Mermaid diagram. Ensure that every component and connection represents the actual system or is explicitly labeled as conceptual.
+
+## 5. EXPLAIN FROM SIMPLE TO DEEP
+
+For every significant component or concept, teach it progressively.
+
+### Level 1: Simple explanation
+
+Explain what it is and why it matters using ordinary language.
+
+Assume the reader is intelligent but has never encountered the concept before.
+
+Use analogies only when they clarify the concept. State where an analogy stops being technically accurate if that distinction matters.
+
+### Level 2: Technical explanation
+
+Explain the actual mechanism, terminology, configuration, responsibilities, and interactions.
+
+Introduce technical vocabulary clearly before relying on it.
+
+### Level 3: Implementation in my project
+
+Connect the concept to the actual implementation.
+
+Reference real file paths, resource names, configuration keys, commands, dependencies, and evidence where available.
+
+Explain what the project does, not just what the technology could do.
+
+### Level 4: Engineering reasoning
+
+Explain why the implementation is reasonable, what constraints it addresses, and what trade-offs it introduces.
+
+Where relevant, discuss alternative designs, operational complexity, failure behavior, security implications, and circumstances in which another approach would be preferable.
+
+### Level 5: Deep internals
+
+For significant or complex topics, explain relevant internal mechanisms, lifecycle behavior, execution order, state transitions, control loops, protocols, consistency guarantees, or other underlying principles.
+
+Only include internals that are relevant to the project and plausible technical questioning.
+
+Never replace technical depth with unnecessary history, lengthy analogies, or textbook material unrelated to the implementation.
+
+## 6. GENERATE PROJECT-SPECIFIC INTERVIEW QUESTIONS
+
+Generate questions based on the actual project evidence, not a generic interview-question list.
+
+Cover every significant component and prioritize complex, security-sensitive, failure-prone, or architecturally important areas.
+
+Include the following categories where relevant:
+
+### A. Foundational questions
+
+- What is this project?
+- What problem does it solve?
+- Who or what consumes its output?
+- What does each significant component do?
+- Why is this component necessary?
+- What would happen if it were removed?
+
+### B. Implementation questions
+
+- How does this actually work?
+- Where is it configured?
+- What happens when it runs?
+- What are its inputs and outputs?
+- How does it interact with other components?
+- Which files control its behavior?
+- What assumptions does the implementation make?
+
+### C. Architecture and system-design questions
+
+- Why was this architecture selected?
+- Why were these technologies chosen?
+- What alternatives were considered or could reasonably be considered?
+- What trade-offs does the design introduce?
+- Where are the system's boundaries and dependencies?
+- How does the design handle growth, failure, or change?
+- What are the system's bottlenecks or single points of failure, if any?
+- Which assumptions would need to change before production deployment?
+
+Do not claim that an alternative was actually considered unless evidence or my confirmation establishes that. Otherwise, frame it as an alternative that could be evaluated.
+
+### D. Deep technical questions
+
+Explore the mechanisms behind important implementation choices.
+
+Depending on the project, examine resource lifecycle, scheduling, networking, storage, concurrency, state management, reconciliation, authentication, authorization, consistency, dependency resolution, execution order, isolation, or other relevant internals.
+
+Prioritize concepts that explain why the implementation behaves as it does.
+
+### E. Security questions
+
+Where relevant, investigate:
+
+- Authentication and authorization.
+- Least privilege and access boundaries.
+- Secrets handling and credential exposure.
+- Network exposure and isolation.
+- Supply-chain and dependency risks.
+- Input validation and trust boundaries.
+- Data protection and encryption.
+- Misconfiguration risks.
+- Security monitoring and incident response.
+- Security controls that are missing or unverified.
+
+Never claim that a project is secure simply because it uses a security tool or includes a security-related configuration.
+
+### F. Reliability and operational questions
+
+Where relevant, examine:
+
+- Health checks and readiness.
+- Logging, metrics, monitoring, and alerting.
+- Failure detection and diagnosis.
+- Retries, timeouts, and resource limits.
+- Backup and restoration.
+- Recovery procedures.
+- Deployment safety and rollback.
+- Configuration drift.
+- Operational maintenance and troubleshooting.
+
+### G. Failure and incident scenarios
+
+Create realistic scenarios based on the actual architecture.
+
+For each important scenario, explain:
+
+1. The initial symptom.
+2. Plausible causes.
+3. The evidence needed to distinguish them.
+4. The diagnostic sequence.
+5. The commands or tools to use.
+6. What each diagnostic result would mean.
+7. The likely corrective action, conditional on the evidence.
+8. How to verify recovery.
+9. How to reduce the chance of recurrence.
+
+Do not present a plausible root cause as confirmed unless evidence supports it.
+
+### H. Challenging senior-engineer and CTO follow-ups
+
+Include questions that challenge the assumptions behind my initial answer.
+
+Examples of question patterns:
+
+- Why did you choose this instead of the alternative?
+- What exactly guarantees that behavior?
+- How would you prove that the system is working?
+- What happens if this dependency becomes unavailable?
+- What happens if two operations occur simultaneously?
+- What happens when the configuration and actual state disagree?
+- Which failure modes does your design not handle?
+- What security assumption could an attacker exploit?
+- How would you redesign this under a different constraint?
+- What evidence supports your claim?
+- What would you change if this had to serve a larger production workload?
+
+Use only relevant scenarios. Adapt every question to the project rather than copying examples indiscriminately.
+
+## 7. ANSWER FORMAT
+
+For important questions, use the following structure.
+
+### Question
+
+State the exact question an interviewer could ask.
+
+**Short interview answer**
+
+Provide a concise, natural answer suitable for speaking aloud.
+
+Write in the first person when appropriate, using claims that are supported by the evidence and confirmed personal contributions.
+
+The answer should communicate the engineering reasoning, not merely list tools.
+
+**Simple explanation**
+
+Explain the underlying idea in plain language.
+
+**Technical deep dive**
+
+Explain how the mechanism works, how the implementation uses it, and what technical details matter.
+
+**Why this approach**
+
+Explain the rationale, constraints, trade-offs, alternatives, and conditions that might make another approach preferable.
+
+Do not invent the historical reason I originally made a decision. Distinguish documented intent from a technically defensible explanation of the choice.
+
+**Project evidence**
+
+Reference relevant files, configuration, commands, logs, tests, or outputs.
+
+Explain precisely what the evidence demonstrates and what it does not demonstrate.
+
+**Likely follow-up questions**
+
+Provide the most useful challenging follow-ups with concise but technically correct answers.
+
+**Limitations and caveats**
+
+Explain relevant weaknesses, unverified behavior, assumptions, or circumstances in which the answer would change.
+
+Do not mechanically repeat every subsection for trivial questions. Keep foundational answers short and reserve the full structure for important technical and architectural questions.
+
+## 8. DESIGN-DECISION DEFENCE
+
+For each significant architectural or implementation decision, establish:
+
+- The problem or requirement it addresses.
+- The constraints that are actually documented.
+- The selected approach.
+- How the approach works.
+- Its benefits.
+- Its costs and disadvantages.
+- Reasonable alternatives.
+- Why those alternatives might be preferable under different circumstances.
+- The security, reliability, and operational implications.
+- The evidence supporting the implementation.
+- What would cause the decision to be reconsidered.
+
+Where the original decision-making process is undocumented, do not invent it. Clearly distinguish a documented historical rationale from an engineering justification that can be made now.
+
+Help me defend the decision honestly, including acknowledging when the implementation was chosen for learning, simplicity, cost, or experimental purposes if that is supported by the evidence.
+
+Do not automatically describe every choice as a best practice.
+
+## 9. PRACTICAL COMMANDS AND DEMONSTRATIONS
+
+Include practical exercises that I can actually perform using the supplied project and its documented environment.
+
+For each important exercise, provide:
+
+- **Objective:** What I am trying to establish.
+- **Prerequisites:** Required tools, access, environment, and permissions.
+- **Command or procedure:** The exact command or a clearly identified template.
+- **Expected observation:** What a successful or unsuccessful result could look like.
+- **Interpretation:** What the result proves and what it does not prove.
+- **Next step:** What to inspect if the result differs from expectations.
+
+Use real project-specific paths, resource names, and commands whenever supported by evidence.
+
+If a command depends on unknown values, mark the placeholders clearly and explain how to obtain them. Do not fabricate resource names or pretend that a command has been tested.
+
+Separate exercises into:
+
+- Read-only inspection.
+- Safe validation and testing.
+- State-changing operations.
+- Potentially destructive or production-sensitive operations.
+
+Warn clearly before operations that could delete resources, overwrite data, expose secrets, incur costs, disrupt workloads, or alter shared infrastructure.
+
+Prefer safe, reproducible demonstrations. Do not recommend destructive exercises against a real or shared environment when a disposable test environment would be more appropriate.
+
+Include troubleshooting exercises and demonstrations that help me prove important claims about my project.
+
+## 10. IDENTIFY AND CLOSE KNOWLEDGE GAPS
+
+Include a dedicated section titled `Knowledge Gaps and Verification Plan`.
+
+For each important gap, identify:
+
+- The question I cannot yet answer confidently.
+- Why the gap matters.
+- What the supplied evidence currently establishes.
+- What remains unknown.
+- The file, documentation, command, test, or experiment needed to resolve it.
+- The concept I need to understand.
+- How I can demonstrate that I have closed the gap.
+
+Distinguish between missing project evidence and missing personal understanding. These are different problems and may require different solutions.
+
+Where useful, prioritize gaps as:
+
+- **Critical:** Affects the correctness, security, or core operation of the system.
+- **High:** Likely to matter in a serious technical interview or operational review.
+- **Medium:** Useful for deeper understanding or future improvement.
+- **Low:** Additional knowledge with limited immediate relevance.
+
+Do not label every unknown as critical. Prioritize based on actual impact.
+
+## 11. WRITING STYLE AND LENGTH CONTROL
+
+The guide must be technically deep but efficient.
+
+Follow these rules:
+
+- Use clear headings and short paragraphs.
+- Explain acronyms and unfamiliar terms on first use.
+- Prefer concrete project examples over generic explanations.
+- Use tables only when they make comparisons easier.
+- Use code blocks for commands and configuration examples.
+- Use diagrams when they materially improve understanding.
+- Avoid repeated definitions and duplicate questions.
+- Remove generic introductions, motivational language, technology histories, and unrelated theory.
+- Avoid lengthy stories and explanations that do not help me understand or defend the implementation.
+- Do not confuse sophisticated vocabulary with technical understanding.
+- Do not omit important technical details merely to make the document shorter.
+
+Cover every significant component. Allocate more depth to high-risk, high-complexity, and high-impact decisions. Use concise answers for straightforward questions.
+
+There is no arbitrary word-count target. Optimize for complete understanding and efficient revision.
+
+## 12. REQUIRED MARKDOWN DOCUMENT STRUCTURE
+
+Produce one cohesive file named `PROJECT-DEFENCE-GUIDE.md` with the following structure, adapting or omitting subsections that are genuinely irrelevant.
+
+# Project Defence Guide
+
+## 1. Project at a Glance
+- What the project does.
+- Problem it solves.
+- Scope and environment.
+- What is implemented and verified.
+- Important limitations.
+
+## 2. Architecture and System Flow
+- Architecture overview.
+- Diagram where useful.
+- Component responsibilities.
+- Dependencies and communication paths.
+- End-to-end execution flows.
+
+## 3. Component-by-Component Technical Notes
+For each significant component:
+- Purpose.
+- Simple explanation.
+- Technical internals.
+- Implementation evidence.
+- Configuration and dependencies.
+- Failure modes.
+- Security and operational implications.
+
+## 4. Important Design Decisions and Trade-offs
+
+## 5. Technical Interview Questions and Answers
+Organized by foundational, implementation, deep technical, architectural, security, reliability, and advanced follow-up questions as appropriate.
+
+## 6. Troubleshooting and Incident Scenarios
+
+## 7. Practical Commands, Tests, and Demonstrations
+
+## 8. Security and Reliability Review
+
+## 9. Limitations and Proposed Improvements
+Clearly separate existing capabilities from proposed improvements.
+
+## 10. Knowledge Gaps and Verification Plan
+
+## 11. Rapid Interview Revision
+Concise questions, direct answers, important distinctions, and high-value facts.
+
+## 12. Final Defence Checklist
+A checklist confirming whether I can:
+- Explain the problem and architecture without reading the guide.
+- Explain each significant component.
+- Trace the important execution flows.
+- Justify the main design decisions.
+- Explain the important failure modes.
+- Diagnose realistic problems.
+- Explain security and reliability trade-offs.
+- Demonstrate important implementation claims.
+- State limitations honestly.
+- Handle unfamiliar follow-up questions by reasoning from first principles.
+
+## 13. FINAL QUALITY-CONTROL PASS
+
+Before delivering the Markdown file, review the entire guide against these checks.
+
+### Evidence accuracy
+- Every project-specific claim is supported or appropriately qualified.
+- No invented features, results, personal contributions, or historical decisions.
+- Unknowns and assumptions are clearly identified.
+- Evidence references point to actual supplied files or outputs.
+
+### Technical accuracy
+- Important technical explanations are consistent with the relevant official documentation.
+- Version-specific claims match the project's versions where verifiable.
+- Commands, configuration examples, and explanations are internally consistent.
+- Security guarantees and failure behavior are not overstated.
+- Proposed improvements are not presented as existing functionality.
+
+### Interview usefulness
+- Questions reflect realistic scrutiny of the actual implementation.
+- Significant design decisions have defensible technical reasoning.
+- Important answers include useful follow-ups.
+- Troubleshooting follows evidence-based diagnostic reasoning.
+- First-person answers are natural, concise, and honest.
+- The guide prepares me to reason through unfamiliar questions rather than rely on memorization.
+
+### Learning quality
+- A beginner can follow the explanations.
+- Deep explanations remain technically precise.
+- Every significant component is covered.
+- High-impact knowledge gaps are prioritized.
+- Practical exercises are relevant and safe.
+
+### Conciseness
+- No unnecessary stories or repeated explanations.
+- No generic question dumps unrelated to the project.
+- No filler sections included merely to satisfy the template.
+- Every section contributes to understanding, evidence, technical defence, or practical verification.
+
+Fix any issues found during this review before delivery.
+
+## 14. DELIVERY REQUIREMENTS
+
+Deliver the complete Markdown document as a file named:
+
+`PROJECT-DEFENCE-GUIDE.md`
+
+Do not substitute a generic explanation of how to write the guide for the actual deliverable.
+
+If the environment supports file creation, create the actual `.md` file and provide it to me.
+
+If file creation is unavailable, provide the complete Markdown content in a single copyable Markdown code block.
+
+If essential project material is missing, explain what was unavailable, proceed with the evidence that exists, and mark the resulting limitations.
+
+Do not claim to have inspected files, run commands, performed tests, or created a file unless those actions actually occurred.
+
+The final deliverable must be a practical study and defence resource grounded in my project—not a marketing document, not a generic textbook, and not a collection of memorized interview answers.
+
+## BEGIN
+
+Analyze the project material I provide. Establish what the evidence supports, build an accurate understanding of the architecture, identify the most important engineering questions, and produce the completed `PROJECT-DEFENCE-GUIDE.md` according to these instructions.
+
+
 # The Engineering Newsroom
 
 ## Gemini project instructions and launch plan
